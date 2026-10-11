@@ -1,0 +1,154 @@
+@import 'tailwindcss';
+
+/* Kaspack — дизайн-токены (бриф v1.2: светлая основа, лайм логотипа + графит) */
+@theme {
+  --color-canvas: #f3f4f1;
+  --color-surface: #ffffff;
+  --color-surface-2: #e9ebe6;
+  --color-ink: #181b21;
+  --color-ink-soft: #4b505a;
+  --color-ink-mute: #6b707a;
+  --color-line: rgb(24 27 33 / 0.12);
+  --color-graphite: #272b33;
+  --color-graphite-2: #32363d;
+  --color-graphite-ink: #e9ebee;
+  --color-graphite-soft: #a3a9b3;
+  --color-lime: #beea1f;
+  --color-lime-hover: #cbf23f;
+  --color-lime-press: #aed515;
+  --color-lime-ink: #4f6300;
+  --color-danger: #b42318;
+
+  --font-display: var(--font-unbounded), 'Arial', sans-serif;
+  --font-sans: var(--font-onest), system-ui, sans-serif;
+
+  --radius-control: 12px;
+  --radius-card: 16px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root {
+  --header-h: 76px;
+  --z-header: 40;
+  --z-overlay: 60;
+  --z-intro: 80;
+  color-scheme: light;
+}
+
+@layer base {
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  background: var(--color-canvas);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+p { text-wrap: pretty; }
+
+input, textarea, select, button { font: inherit; }
+input, textarea, select { font-size: 16px; }
+
+a, button, [role='button'] { touch-action: manipulation; }
+
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.on-dark :focus-visible { outline-color: var(--color-lime); }
+
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+@layer components {
+/* Кнопки: одна система на весь сайт */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  min-height: 52px; padding: 0 1.4rem;
+  border-radius: var(--radius-control);
+  font-weight: 600; font-size: 16px; line-height: 1; white-space: nowrap;
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out),
+    transform 140ms var(--ease-out), box-shadow 160ms var(--ease-out);
+  user-select: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--color-lime); color: var(--color-ink); }
+.btn-primary:active { background: var(--color-lime-press); }
+.btn-ghost { background: transparent; color: var(--color-ink); box-shadow: inset 0 0 0 1px var(--color-line); }
+.btn-dark { background: var(--color-ink); color: #fff; }
+.btn[disabled] { opacity: 0.55; pointer-events: none; }
+
+/* Шеврон-стрелка в CTA (решение С4: дозированное использование знака) */
+.btn .chev { transition: transform 200ms var(--ease-out); }
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: var(--color-lime-hover); }
+  .btn-ghost:hover { box-shadow: inset 0 0 0 1px var(--color-ink); }
+  .btn-dark:hover { background: #2b2f37; }
+  .btn:hover .chev { transform: translateY(2px); }
+  .link:hover { color: var(--color-ink); }
+}
+
+.field {
+  width: 100%; min-height: 52px; padding: 0 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line); border-radius: var(--radius-control);
+  color: var(--color-ink);
+  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+.field::placeholder { color: var(--color-ink-mute); }
+.field:focus { outline: none; border-color: var(--color-ink); box-shadow: 0 0 0 3px rgb(190 234 31 / 0.55); }
+.field[aria-invalid='true'] { border-color: var(--color-danger); }
+
+}
+
+/* Появление при скролле: один раз, только transform/opacity */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out); }
+  .reveal[data-visible='true'] { opacity: 1; transform: none; }
+}
+
+.skip-link {
+  position: absolute; left: 1rem; top: -100px; z-index: 100;
+  background: var(--color-ink); color: #fff; padding: 0.75rem 1rem; border-radius: 10px;
+}
+.skip-link:focus { top: 1rem; }
+
+/* Интро-строки заголовка: поднимаются из маски */
+@media (prefers-reduced-motion: no-preference) {
+  .line-rise > span { display: block; animation: rise 900ms var(--ease-out) both; }
+  .line-rise > span:nth-child(2) { animation-delay: 80ms; }
+  .line-rise > span:nth-child(3) { animation-delay: 160ms; }
+  .line-rise > span:nth-child(4) { animation-delay: 240ms; }
+  .fade-in { animation: fade 900ms var(--ease-out) both; animation-delay: var(--d, 300ms); }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(0.6em); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* Интро логотипа: видно только при html[data-intro] (ставится inline-скриптом до отрисовки) */
+.intro { display: none; }
+html[data-intro='1'] .intro { display: grid; animation: introOut 450ms var(--ease-out) 900ms both; }
+html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) both; }
+@keyframes introMark {
+  from { clip-path: inset(0 0 100% 0); transform: translateY(-10px); }
+  to { clip-path: inset(0 0 0 0); transform: none; }
+}
+@keyframes introOut { to { opacity: 0; visibility: hidden; } }

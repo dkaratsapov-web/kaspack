@@ -2,3 +2,7 @@ node_modules/
 reports/
 .superpowers/
 .audit/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.env*.local
