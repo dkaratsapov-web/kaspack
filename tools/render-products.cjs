@@ -25,7 +25,7 @@ const slugs = ['strejch-plenka','bopp-plenka','vozdushno-puzyrchataya-plenka','p
         await p.waitForTimeout(1800);
         loaded = true;
       }
-      await p.locator('canvas').screenshot({ path: file, omitBackground: true });
+      await p.locator('canvas').screenshot({ path: file, omitBackground: true, timeout: 120000 });
     }
     console.log('ok', slug);
   }
