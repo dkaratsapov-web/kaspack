@@ -1,0 +1,16 @@
+{
+  "name": "kaspack-redesign",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Редизайн kaspack.ru: новый сайт + сервис скриншотов и анализа страниц",
+  "type": "module",
+  "scripts": {
+    "inspect": "node tools/site-inspector/inspect.mjs",
+    "drawings": "node tools/drawings/build.mjs",
+    "qa": "node tools/site-inspector/inspect.mjs http://localhost:3000 --out reports/new-site --crawl 1"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.3",
+    "playwright": "1.56.1"
+  }
+}
