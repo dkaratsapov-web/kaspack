@@ -23,6 +23,11 @@ function Cam({ angle }: { angle: number }) {
 export default function RenderLab() {
   const [q, setQ] = useState<{ slug: string; angle: number } | null>(null);
   useEffect(() => {
+    // прозрачный фон страницы: рендер ложится на любой цвет поля без «квадрата»
+    document.documentElement.style.background = 'transparent';
+    document.body.style.background = 'transparent';
+    document.querySelector('header')?.remove();
+    document.querySelector('footer')?.remove();
     const p = new URLSearchParams(location.search);
     setQ({ slug: p.get('slug') || 'strejch-plenka', angle: Number(p.get('angle') || 0) });
     // скрипт рендера меняет ракурс без перезагрузки страницы

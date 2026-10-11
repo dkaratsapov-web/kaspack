@@ -9,7 +9,7 @@ const STEPS = [
 export function Process() {
   return (
     <section id="process" aria-labelledby="process-title" className="mx-auto max-w-[1360px] px-5 py-24 md:px-8 md:py-32">
-      <h2 id="process-title" className="reveal max-w-[20ch] text-[clamp(1.75rem,3vw,2.6rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
+      <h2 id="process-title" className="reveal title">
         Как проходит заказ
       </h2>
       <ol className="mt-12 grid gap-8 md:grid-cols-4 md:gap-6">

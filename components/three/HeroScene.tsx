@@ -27,8 +27,8 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const target = new THREE.Vector3(0, STACK_TOP * 0.47, 0);
-    const vFit = (STACK_TOP * 1.32) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
-    const hFit = (1.95 / cam.aspect) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
+    const vFit = (STACK_TOP * 1.12) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
+    const hFit = (1.7 / cam.aspect) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
     const dist = Math.max(vFit, hFit);
     const dir = new THREE.Vector3(0.0, 0.38, 1).normalize();
     cam.position.copy(target).addScaledVector(dir, dist);
@@ -86,7 +86,7 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
         <Suspense fallback={null}>
           <Studio />
           <Rig state={state} reduced={reduced} />
-          <ContactShadows position={[0, 0, 0]} opacity={0.42} scale={4.5} blur={2.6} far={1.6} resolution={512} color="#1c1f26" />
+          <ContactShadows position={[0, 0, 0]} opacity={0.55} scale={4.5} blur={2.4} far={1.6} resolution={512} color="#2b3a00" />
         </Suspense>
       </Canvas>
     </div>

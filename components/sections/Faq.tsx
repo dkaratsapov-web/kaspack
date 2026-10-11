@@ -14,7 +14,7 @@ export function Faq() {
   return (
     <section id="faq" aria-labelledby="faq-title" className="mx-auto max-w-[1360px] px-5 py-24 md:px-8 md:py-32">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-        <h2 id="faq-title" className="reveal text-[clamp(1.75rem,3vw,2.6rem)] font-semibold leading-[1.1] tracking-[-0.03em] lg:col-span-4">
+        <h2 id="faq-title" className="reveal title lg:col-span-4">
           Частые вопросы
         </h2>
         <div className="divide-y divide-line border-y border-line lg:col-span-8">

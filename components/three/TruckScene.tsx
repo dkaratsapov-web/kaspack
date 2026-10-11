@@ -150,7 +150,7 @@ export default function TruckScene({ progress }: { progress: React.RefObject<num
           <group scale={1}>
             <Truck progress={progress} />
           </group>
-          <ContactShadows position={[0, 0, 0]} opacity={0.7} scale={40} blur={2.2} far={4} resolution={1024} color="#000000" />
+          <ContactShadows position={[0, 0, 0]} opacity={0.6} scale={40} blur={2.2} far={4} resolution={1024} color="#000000" />
         </Suspense>
       </Canvas>
     </div>

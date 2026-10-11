@@ -51,7 +51,7 @@ export function Header() {
           }`}
         >
           <Link href="/" aria-label="Kaspack, на главную" className="shrink-0 rounded-md">
-            <Logo compact={scrolled} />
+            <Logo compact={scrolled} onLime={!scrolled} />
           </Link>
 
           <nav aria-label="Основная навигация" className="hidden lg:block">
@@ -70,7 +70,7 @@ export function Header() {
             <a href={company.phoneHref} className="hidden text-[15px] font-semibold tabular md:block" data-goal="tel_click">
               {company.phone}
             </a>
-            <a href="#calc" className="btn btn-primary hidden !min-h-[44px] sm:inline-flex" data-goal="cta_header">
+            <a href="#calc" className="btn btn-dark hidden !min-h-[44px] sm:inline-flex" data-goal="cta_header">
               Рассчитать заказ
             </a>
             <button

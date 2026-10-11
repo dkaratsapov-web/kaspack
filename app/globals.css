@@ -2,15 +2,18 @@
 
 /* Kaspack — дизайн-токены (бриф v1.2: светлая основа, лайм логотипа + графит) */
 @theme {
-  --color-canvas: #f3f4f1;
+  --color-canvas: #eeede6;
+  --color-bone: #eeede6;
+  --color-kraft: #c69c6d;
+  --color-kraft-ink: #2a1f14;
   --color-surface: #ffffff;
   --color-surface-2: #e9ebe6;
   --color-ink: #181b21;
   --color-ink-soft: #4b505a;
   --color-ink-mute: #62676f;
   --color-line: rgb(24 27 33 / 0.12);
-  --color-graphite: #272b33;
-  --color-graphite-2: #32363d;
+  --color-graphite: #1e2127;
+  --color-graphite-2: #2a2e35;
   --color-graphite-ink: #e9ebee;
   --color-graphite-soft: #a3a9b3;
   --color-lime: #beea1f;
@@ -187,3 +190,38 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 .faq-chev { transition: transform 200ms var(--ease-out); }
 .faq[open] .faq-chev { transform: rotate(180deg); }
 .faq summary::-webkit-details-marker { display: none; }
+
+/* ===== Редизайн v2: типографика-гигант и цветные поля (frontend-design + premium-web-design) ===== */
+:root {
+  --t-giant: clamp(3.4rem, 13.2vw, 15.5rem);   /* 54 → 190 при 1440: дисплей = картинка */
+  --t-title: clamp(2.3rem, 5.4vw, 5.6rem);     /* заголовки глав */
+  --t-lead: clamp(1.15rem, 1.05rem + 0.4vw, 1.45rem);
+  --e-settle: cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+@layer components {
+.giant {
+  font-family: var(--font-display); font-weight: 800; text-transform: uppercase;
+  font-size: var(--t-giant); line-height: 0.84; letter-spacing: -0.055em;
+}
+.title { font-family: var(--font-display); font-weight: 700; font-size: var(--t-title); line-height: 0.96; letter-spacing: -0.045em; }
+.lead { font-size: var(--t-lead); line-height: 1.45; }
+.field-lime { background: var(--color-lime); color: var(--color-ink); }
+.field-graphite { background: var(--color-graphite); color: #eceef1; }
+.field-kraft { background: var(--color-kraft); color: var(--color-kraft-ink); }
+.field-bone { background: var(--color-bone); color: var(--color-ink); }
+}
+/* зерно на цветных полях: убирает «пластик» с плоских заливок (не на скролл-контейнерах) */
+.grain::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.07; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: no-preference) {
+  .giant-rise > span { display: block; animation: giantRise 1100ms var(--e-settle) both; }
+  .giant-rise > span:nth-child(2) { animation-delay: 90ms; }
+  .giant-rise > span:nth-child(3) { animation-delay: 180ms; }
+}
+@keyframes giantRise { from { transform: translateY(0.35em); opacity: 0; clip-path: inset(0 0 100% 0); } to { transform: none; opacity: 1; clip-path: inset(0 0 -10% 0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-word { animation: chapterIn 700ms var(--e-settle) both; }
+}
+@keyframes chapterIn { from { opacity: 0; transform: translateY(calc(-50% + 0.12em)); } to { opacity: 1; transform: translateY(-50%); } }

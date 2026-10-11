@@ -1,50 +1,32 @@
 import { HeroVisual } from './HeroVisual';
 import { LeadForm } from './LeadForm';
-import { facts } from '@/lib/content';
 
-// Первый экран (бриф: С1 «индустриальный премиум», решение 4 — заголовок, решение 6 — форма в hero).
+// Hero v2 (frontend-design: «типографика как картинка»; премиум-корпус: fizzi/tripletta — объект перекрывает буквы).
+// Слои: лаймовое поле → гигантские слова → 3D-груз (canvas) → форма.
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div className="mx-auto grid max-w-[1360px] px-5 md:px-8 lg:min-h-[min(calc(100svh-var(--header-h)-104px),800px)] lg:grid-cols-12 lg:gap-8">
-        <div className="relative z-10 flex flex-col justify-center pb-6 pt-8 lg:col-span-6 lg:pb-16 lg:pt-6">
-          <p className="fade-in mb-6 flex items-center gap-2.5 text-[14px] font-semibold text-ink-soft" style={{ ['--d' as string]: '120ms' }}>
-            <span className="h-[3px] w-6 rounded-full bg-lime" aria-hidden="true" />
-            Собственное производство в Твери
+    <section aria-labelledby="hero-title" className="field-lime grain relative isolate -mt-[var(--header-h)] overflow-hidden pt-[var(--header-h)]">
+      <div className="relative mx-auto min-h-[max(calc(100svh-var(--header-h)),700px)] max-w-[1600px] px-5 md:px-10">
+        <h1 id="hero-title" className="giant giant-rise relative z-0 pt-[clamp(1rem,3vh,2.5rem)] text-[11.4vw] lg:text-[min(8.7vw,15.5vh,11rem)] text-ink">
+          <span>Упакуем</span>
+          <span className="lg:pl-[0.35em]">отгрузку</span>
+          <span>целиком</span>
+          <span className="sr-only">: от поддона до плёнки</span>
+        </h1>
+
+        {/* 3D-груз поверх букв */}
+        <div className="pointer-events-none relative z-10 -mx-5 -my-4 h-[88vw] max-h-[520px] md:-mx-10 lg:absolute lg:inset-auto lg:bottom-[-2%] lg:left-[50%] lg:right-[-3%] lg:top-[19%] lg:m-0 lg:h-auto lg:max-h-none" aria-hidden="true">
+          <HeroVisual />
+        </div>
+
+        <div className="relative z-20 grid gap-6 pb-10 lg:absolute lg:bottom-10 lg:left-10 lg:mt-0 lg:w-[min(46rem,52%)] lg:pb-0">
+          <p className="lead max-w-[34ch] font-medium" aria-hidden="true">
+            От поддона до плёнки: 17 видов упаковки собственного производства. Доставляем своим транспортом по всей России.
           </p>
-          <h1
-            id="hero-title"
-            className="line-rise text-[clamp(1.9rem,2.85vw,2.8rem)] font-semibold leading-[1.1] tracking-[-0.03em] lg:[&>span]:whitespace-nowrap"
-          >
-            <span>Упакуем отгрузку</span>
-            <span>целиком: от поддона</span>
-            <span>до плёнки</span>
-          </h1>
-          <p className="fade-in mt-6 max-w-[34rem] text-[18px] leading-relaxed text-ink-soft" style={{ ['--d' as string]: '320ms' }}>
-            Стрейч-плёнка, гофротара, поддоны, метизы и ещё 13 видов упаковки от производителя. Доставка своим транспортом по всей России.
-          </p>
-          <div className="fade-in mt-9 max-w-[40rem]" style={{ ['--d' as string]: '440ms' }}>
+          <div className="rounded-[20px] bg-white/90 p-3 shadow-[0_30px_60px_-30px_rgb(30_33_39/0.45)] backdrop-blur md:p-4">
             <LeadForm source="hero" />
           </div>
         </div>
-
-        {/* 3D-груз: на десктопе занимает правую часть, на мобильном — блок под текстом */}
-        <div className="relative -mx-5 h-[min(78vw,460px)] md:-mx-8 lg:col-span-6 lg:mx-0 lg:h-auto">
-          <div className="absolute inset-0 lg:-right-[6vw]">
-            <HeroVisual />
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-[1360px] px-5 md:px-8">
-        <ul className="grid grid-cols-2 gap-y-6 border-t border-line py-7 md:grid-cols-4">
-          {facts.map((f) => (
-            <li key={f.label} className="pr-6">
-              <p className="font-display text-[22px] font-semibold tracking-[-0.02em] tabular">{f.value}</p>
-              <p className="mt-1 text-[14px] leading-snug text-ink-soft">{f.label}</p>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

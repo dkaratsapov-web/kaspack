@@ -21,8 +21,8 @@ export default function HomePage() {
       <Explode />
       <Custom />
       <Production />
-      <Calculator />
       <Delivery />
+      <Calculator />
       <Process />
       <Dealers />
       <Faq />

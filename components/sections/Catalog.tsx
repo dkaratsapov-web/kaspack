@@ -1,92 +1,101 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { categories, families, type Category } from '@/lib/content';
+import { useEffect, useRef, useState } from 'react';
+import { categories, families } from '@/lib/content';
 import { asset } from '@/lib/env';
 
-type Fam = keyof typeof families | 'all';
-
-function Card({ c }: { c: Category }) {
-  const [ready, setReady] = useState(false);
-  const preload = () => {
-    if (ready) return;
-    const img = new Image();
-    img.onload = () => setReady(true);
-    img.src = asset(`/catalog/${c.slug}-spin.webp`);
-  };
-  return (
-    <li className="group" data-spin-ready={ready || undefined} onPointerEnter={preload}>
-      <Link
-        href={`/${c.slug}`}
-        className="flex h-full flex-col rounded-[var(--radius-card)] bg-surface p-3 shadow-[0_1px_0_var(--color-line),0_10px_30px_-24px_rgb(24_27_33/0.35)] transition-shadow duration-200"
-        data-goal="category_open"
-      >
-        <div className="spin relative aspect-square overflow-hidden rounded-[12px] bg-canvas">
-          <img
-            src={asset(`/catalog/${c.slug}.webp`)}
-            alt=""
-            width={480}
-            height={480}
-            loading="lazy"
-            decoding="async"
-            className="spin-still absolute inset-0 h-full w-full object-contain"
-          />
-          <span
-            aria-hidden="true"
-            className="spin-sprite absolute inset-0"
-            style={{ ['--spin' as string]: `url(${asset(`/catalog/${c.slug}-spin.webp`)})` }}
-          />
-        </div>
-        <div className="flex flex-1 flex-col px-1.5 pb-1.5 pt-4">
-          <h3 className="font-display text-[15px] font-semibold leading-snug tracking-[-0.01em]">{c.title}</h3>
-          <p className="mt-1.5 text-[14px] leading-snug text-ink-soft">{c.spec}</p>
-          <span className="mt-auto flex items-center gap-1.5 pt-4 text-[14px] font-semibold text-lime-ink">
-            Подробнее
-            <svg className="h-2 w-3 -rotate-90" viewBox="0 0 190 88" aria-hidden="true"><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
-          </span>
-        </div>
-      </Link>
-    </li>
-  );
-}
-
+// Каталог v2 — «конвейер» (premium-web-design: section system 6, горизонтальная глава от вертикального скролла).
+// Десктоп: секция залипает, лента с 17 товарами едет влево. Телефон: нативная горизонтальная прокрутка со snap.
 export function Catalog() {
-  const [fam, setFam] = useState<Fam>('all');
-  const list = fam === 'all' ? categories : categories.filter((c) => c.family === fam);
-  const tabs: [Fam, string][] = [['all', 'Все'], ...(Object.entries(families) as [Fam, string][])];
+  const section = useRef<HTMLElement>(null);
+  const track = useRef<HTMLUListElement>(null);
+  const belt = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | null>(null);
+  const [index, setIndex] = useState(1);
+
+  useEffect(() => {
+    const el = section.current, tr = track.current;
+    if (!el || !tr) return;
+    const desktop = matchMedia('(min-width: 1024px)').matches;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!desktop || reduced) return;
+
+    const SPEED = 1.9; // px горизонтали на 1 px скролла
+    let distance = 0, frame = 0;
+    const measure = () => {
+      distance = Math.max(0, tr.scrollWidth - window.innerWidth + 80);
+      setHeight(window.innerHeight + distance / SPEED);
+    };
+    const update = () => {
+      frame = 0;
+      const rect = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (-rect.top * SPEED) / Math.max(1, distance)));
+      tr.style.transform = `translate3d(${(-p * distance).toFixed(1)}px,0,0)`;
+      if (belt.current) belt.current.style.backgroundPositionX = `${(-p * distance).toFixed(1)}px`;
+      const i = Math.min(categories.length, Math.max(1, Math.round(p * (categories.length - 1)) + 1));
+      setIndex((prev) => (prev === i ? prev : i));
+    };
+    // один пассивный слушатель, сведённый в rAF (claude-web-skills 4.4)
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    measure(); update();
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', measure);
+    return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', measure); if (frame) cancelAnimationFrame(frame); };
+  }, []);
 
   return (
-    <section id="catalog" aria-labelledby="catalog-title" className="mx-auto max-w-[1360px] px-5 pb-24 pt-20 md:px-8 md:pb-32 md:pt-28">
-      <div className="reveal flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h2 id="catalog-title" className="max-w-[18ch] text-[clamp(1.75rem,3vw,2.6rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
-            17 видов упаковки от одного поставщика
-          </h2>
-          <p className="mt-4 max-w-[52ch] text-ink-soft">
-            Закупайте всё для отгрузки в одном месте: один договор, один менеджер, одна доставка.
+    <section
+      ref={section}
+      id="catalog"
+      aria-labelledby="catalog-title"
+      className="field-bone relative"
+      style={height ? { height } : undefined}
+    >
+      <div className="overflow-hidden lg:sticky lg:top-0 lg:flex lg:h-[100svh] lg:flex-col lg:justify-center">
+        <div className="mx-auto flex w-full max-w-[1600px] items-end justify-between gap-8 px-5 pt-24 md:px-10 lg:pt-20">
+          <h2 id="catalog-title" className="title max-w-[14ch]">17 видов упаковки на одной ленте</h2>
+          <p className="hidden shrink-0 font-display text-[clamp(2rem,3.4vw,3.4rem)] font-bold tabular tracking-[-0.04em] lg:block" aria-hidden="true">
+            {String(index).padStart(2, '0')}<span className="text-ink/25"> / {categories.length}</span>
           </p>
         </div>
-        <div role="group" aria-label="Фильтр по типу упаковки" className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] lg:mx-0 lg:px-0">
-          {tabs.map(([k, label]) => (
-            <button
-              key={k}
-              type="button"
-              aria-pressed={fam === k}
-              onClick={() => setFam(k)}
-              className={`h-10 shrink-0 rounded-full px-4 text-[14px] font-semibold transition-colors duration-150 ${
-                fam === k ? 'bg-ink text-white' : 'bg-surface text-ink-soft shadow-[inset_0_0_0_1px_var(--color-line)]'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+
+        <div className="relative mt-8 lg:mt-10">
+          <ul
+            ref={track}
+            className="relative z-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-4 [scrollbar-width:none] md:px-10 lg:snap-none lg:gap-8 lg:overflow-visible lg:will-change-transform"
+          >
+            {categories.map((c, i) => (
+              <li key={c.slug} className="group w-[72vw] shrink-0 snap-start sm:w-[42vw] lg:w-[min(30vw,460px)]">
+                <Link href={`/${c.slug}`} className="block" data-goal="category_open">
+                  <div className="spin relative aspect-square">
+                    <img
+                      src={asset(`/catalog/${c.slug}.webp`)}
+                      alt=""
+                      width={480}
+                      height={480}
+                      loading={i < 4 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      className="spin-still absolute inset-0 h-full w-full object-contain transition-transform duration-500 [transition-timing-function:var(--e-settle)] group-hover:-translate-y-2"
+                    />
+                    <span aria-hidden="true" className="spin-sprite absolute inset-0" style={{ ['--spin' as string]: `url(${asset(`/catalog/${c.slug}-spin.webp`)})` }} />
+                  </div>
+                  <p className="mt-3 text-[14px] font-semibold text-ink-mute tabular">{String(i + 1).padStart(2, '0')} · {families[c.family]}</p>
+                  <h3 className="mt-1.5 font-display text-[clamp(1.25rem,1.6vw,1.65rem)] font-bold leading-[1.08] tracking-[-0.03em]">{c.title}</h3>
+                  <p className="mt-2 max-w-[32ch] text-[15px] text-ink-soft">{c.spec}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {/* лента конвейера с роликами — едет вместе с товарами */}
+          <div
+            ref={belt}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-[calc(min(30vw,460px)*0.86)] z-0 hidden h-5 bg-ink lg:block"
+            style={{ backgroundImage: 'radial-gradient(circle at 12px 10px, #4a4f58 0 5px, transparent 6px)', backgroundSize: '48px 20px' }}
+          />
         </div>
       </div>
-
-      <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
-        {list.map((c) => <Card key={c.slug} c={c} />)}
-      </ul>
     </section>
   );
 }
