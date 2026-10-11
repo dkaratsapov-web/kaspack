@@ -6,3 +6,4 @@ reports/
 next-env.d.ts
 *.tsbuildinfo
 .env*.local
+out/
