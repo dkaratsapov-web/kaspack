@@ -2,21 +2,10 @@
 
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { ContactShadows, Environment, Lightformer } from '@react-three/drei';
+import { ContactShadows } from '@react-three/drei';
+import { Studio } from './Studio';
 import * as THREE from 'three';
 import { LoadedPallet, STACK_TOP, type PalletState } from './LoadedPallet';
-
-// Студийный свет без HDRI-файлов (не зависим от CDN): софтбоксы из Lightformer.
-function Studio() {
-  return (
-    <Environment resolution={256} frames={1}>
-      <Lightformer form="rect" intensity={2.4} position={[0, 5, 1]} scale={[8, 3, 1]} rotation-x={Math.PI / 2} />
-      <Lightformer form="rect" intensity={1.6} position={[-5, 2, 2]} scale={[3, 4, 1]} rotation-y={Math.PI / 2} />
-      <Lightformer form="rect" intensity={1.1} position={[5, 1.5, -1]} scale={[3, 3, 1]} rotation-y={-Math.PI / 2} />
-      <Lightformer form="ring" color="#beea1f" intensity={0.6} position={[3, 3, -4]} scale={2} />
-    </Environment>
-  );
-}
 
 function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced: boolean }) {
   const group = useRef<THREE.Group>(null);
@@ -96,7 +85,6 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
       >
         <Suspense fallback={null}>
           <Studio />
-          <directionalLight position={[2.5, 4.5, 3]} intensity={1.4} />
           <Rig state={state} reduced={reduced} />
           <ContactShadows position={[0, 0, 0]} opacity={0.42} scale={4.5} blur={2.6} far={1.6} resolution={512} color="#1c1f26" />
         </Suspense>

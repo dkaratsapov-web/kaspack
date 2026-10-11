@@ -1,9 +1,23 @@
-# Kaspack — редизайн kaspack.ru
+# Kaspack — новый сайт kaspack.ru
 
-- `docs/BRIEF.md` — бриф проекта (на согласовании)
-- `docs/skills-analysis.md` — анализ установленных скиллов Claude Code
-- `tools/site-inspector` — сервис скриншотов и анализа страниц: `npm run inspect -- <url> [--crawl 1] [--out reports/x]`
-- `tools/drawings` — генератор технических чертежей (SVG): `npm run drawings`
-- `prototypes/` — черновики 3D-сцены и чертежей до утверждения брифа
+Next.js 16 · React 19 · React Three Fiber · Tailwind v4 · статический экспорт.
 
-Установка: `npm install` (Playwright использует предустановленный Chromium окружения).
+- **Превью:** https://dkaratsapov-web.github.io/kaspack/ (после включения Pages, см. `docs/DEPLOY.md`)
+- `docs/BRIEF.md` — утверждённый бриф (v1.2)
+- `docs/DEPLOY.md` — развёртывание: GitHub Pages и VPS в РФ, приём заявок (почта, Telegram, amoCRM)
+- `docs/skills-analysis.md` — анализ установленных скиллов
+
+## Разработка
+```bash
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # статический сайт в out/
+npm run inspect -- http://localhost:3000 --crawl 1   # скриншоты и аудит страниц
+```
+
+## Структура
+- `app/` — страницы: главная, 17 категорий (`[slug]`), `/partneram`, политика ПДн
+- `components/` — шапка, hero, секции главной (`sections/`), 3D-сцены (`three/`)
+- `lib/content.ts` — все факты о компании и каталог (единый источник)
+- `server/lead-server.mjs` — приём заявок на VPS
+- `tools/` — сервис скриншотов, рендер 3D-превью каталога, генератор чертежей

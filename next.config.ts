@@ -6,10 +6,13 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 const nextConfig: NextConfig = {
   output: 'export',
+  // служебная рендер-лаборатория (app/render-lab/page.lab.tsx) собирается только при RENDER_LAB=1
+  pageExtensions: process.env.RENDER_LAB ? ['lab.tsx', 'tsx', 'ts'] : ['tsx', 'ts'],
   basePath,
   assetPrefix: basePath || undefined,
   trailingSlash: false,
   reactStrictMode: true,
+  devIndicators: false,
   poweredByHeader: false,
   images: { unoptimized: true },
 };

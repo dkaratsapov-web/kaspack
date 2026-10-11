@@ -1,0 +1,15 @@
+# /etc/systemd/system/kaspack-lead.service
+[Unit]
+Description=Kaspack lead server
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/kaspack/lead.env
+WorkingDirectory=/var/www/kaspack/server
+ExecStart=/usr/bin/node lead-server.mjs
+Restart=always
+User=www-data
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

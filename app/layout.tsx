@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { Intro, introBootScript } from '@/components/Intro';
 import { company } from '@/lib/content';
 
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">К содержимому</a>
         <Header />
         <main id="main">{children}</main>
+        <Footer />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </body>
     </html>

@@ -1,25 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useId, useState } from 'react';
 import { salesStatus } from '@/lib/content';
 import { leadEndpoint } from '@/lib/env';
+import { formatPhone, submitLead } from '@/lib/lead';
 
 type Status = 'idle' | 'sending' | 'ok' | 'error';
-
-function formatPhone(raw: string) {
-  let d = raw.replace(/\D/g, '');
-  if (d.startsWith('8')) d = '7' + d.slice(1);
-  if (!d.startsWith('7')) d = '7' + d;
-  d = d.slice(0, 11);
-  const p = d.slice(1);
-  let out = '+7';
-  if (p.length) out += ' (' + p.slice(0, 3);
-  if (p.length >= 3) out += ')';
-  if (p.length > 3) out += ' ' + p.slice(3, 6);
-  if (p.length > 6) out += '-' + p.slice(6, 8);
-  if (p.length > 8) out += '-' + p.slice(8, 10);
-  return out;
-}
 
 // Короткая форма (бриф, решение 6): имя + телефон + согласие. Ошибки при уходе с поля.
 export function LeadForm({ source, layout = 'inline' }: { source: string; layout?: 'inline' | 'stack' }) {
@@ -48,23 +35,8 @@ export function LeadForm({ source, layout = 'inline' }: { source: string; layout
     setStatus('sending');
     const fd = new FormData(e.currentTarget);
     try {
-      if (!leadEndpoint) {
-        // Превью на GitHub Pages: сервера заявок нет, показываем успешный сценарий
-        await new Promise((r) => setTimeout(r, 600));
-        setStatus('ok');
-        return;
-      }
-      const res = await fetch(leadEndpoint, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(), phone: '+' + phoneDigits, consent, source,
-          website: fd.get('website') ?? '', page: location.pathname + location.search,
-        }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
+      await submitLead({ name: name.trim(), phone: '+' + phoneDigits, consent, source, website: String(fd.get('website') ?? '') });
       setStatus('ok');
-      (window as unknown as { ym?: (...a: unknown[]) => void }).ym?.(0, 'reachGoal', 'lead_form_submit');
     } catch {
       setStatus('error');
     }
@@ -87,7 +59,7 @@ export function LeadForm({ source, layout = 'inline' }: { source: string; layout
     <form onSubmit={onSubmit} noValidate aria-describedby={`${id}-sla`}>
       {/* honeypot для ботов */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-        <label>Сайт <input name="website" tabIndex={-1} autoComplete="off" /></label>
+        <label>Сайт <input name="website" aria-label="Не заполняйте это поле" tabIndex={-1} autoComplete="off" /></label>
       </div>
       <div className={inline ? 'grid gap-3 sm:grid-cols-[1fr_1.1fr_auto]' : 'grid gap-3'}>
         <div>
@@ -122,7 +94,7 @@ export function LeadForm({ source, layout = 'inline' }: { source: string; layout
             className="mt-0.5 h-[18px] w-[18px] shrink-0 accent-[var(--color-ink)]" aria-invalid={!!show('consent')}
           />
           <span>
-            Согласен на <a href="/politika-obrabotki-personalnyh-dannyh" className="underline decoration-ink/30 underline-offset-2">обработку персональных данных</a>
+            Согласен на <Link href="/politika-obrabotki-personalnyh-dannyh" className="underline decoration-ink/30 underline-offset-2">обработку персональных данных</Link>
             {show('consent') && <span className="block text-danger">{show('consent')}</span>}
           </span>
         </label>

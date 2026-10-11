@@ -185,13 +185,14 @@ export function LoadedPallet({ state }: { state: React.RefObject<PalletState> })
   const ref = (k: string) => (g: THREE.Group | null) => { layers.current[k] = g; };
   return (
     <group>
-      <group ref={ref('pallet')}><Pallet m={m} /></group>
+      <group ref={ref('pallet')}><Pallet m={m} /><group name="anchor-pallet" position={[W / 2, 0.07, D / 2]} /></group>
       <group ref={ref('tier1')}><Tier t={0} m={m} /></group>
       <group ref={ref('tier2')}><Tier t={1} m={m} /></group>
-      <group ref={ref('tier3')}><Tier t={2} m={m} /></group>
-      <group ref={ref('strap')}><Strapping m={m} /></group>
+      <group ref={ref('tier3')}><Tier t={2} m={m} /><group name="anchor-tier" position={[W / 2, PH + BH * 2.5, D / 2]} /></group>
+      <group ref={ref('strap')}><Strapping m={m} /><group name="anchor-strap" position={[0.32, STACK_TOP, D / 2]} /></group>
       <group ref={ref('film')}>
         <mesh geometry={geo} material={m.film} renderOrder={2} />
+        <group name="anchor-film" position={[-W / 2 - 0.02, PH + BH * 1.6, D / 2 + 0.02]} />
       </group>
     </group>
   );

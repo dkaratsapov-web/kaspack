@@ -1,0 +1,7 @@
+{
+  "name": "kaspack-lead-server",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node lead-server.mjs" },
+  "dependencies": { "nodemailer": "6.10.1" }
+}
