@@ -6,7 +6,7 @@ import { ContactShadows } from '@react-three/drei';
 import { Studio } from './Studio';
 import * as THREE from 'three';
 import { LoadedPallet, STACK_TOP, TOP_CARTONS, type PalletState } from './LoadedPallet';
-import HeroHandoff from './HeroHandoff';
+import HeroHandoff, { DAMP } from './HeroHandoff';
 import { heroProgress } from '@/lib/heroProgress';
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -26,6 +26,7 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
   const group = useRef<THREE.Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
   const start = useRef<number | null>(null);
+  const qs = useRef(heroProgress.q);
   const frame = useRef<Frame>({ target: new THREE.Vector3(0, STACK_TOP * 0.47, 0), dist: 5 });
   const { camera, size, gl } = useThree();
   const tmp = useMemo(() => ({ a: new THREE.Vector3(), dir: new THREE.Vector3() }), []);
@@ -60,7 +61,9 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
     if (!group.current || !state.current) return;
     if (start.current === null) start.current = s.clock.elapsedTime;
     const t = s.clock.elapsedTime - start.current;
-    const q = reduced ? 0 : heroProgress.q;
+    // прогресс сглажен по времени (та же постоянная, что у слоя товаров): шаги колеса не дёргают сцену
+    qs.current += ((reduced ? 0 : heroProgress.q) - qs.current) * (1 - Math.exp(-dt * DAMP));
+    const q = qs.current;
     const cam = camera as THREE.PerspectiveCamera;
 
     // камера: с ростом q поднимается и чуть отъезжает — видно, как раскрываются короба
@@ -128,7 +131,7 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
   return (
     <div ref={wrap} className="absolute inset-0">
       <Canvas
-        dpr={[1, 1.75]}
+        dpr={[1, pinned ? 1.5 : 1.75]}
         frameloop={visible ? 'always' : 'never'}
         camera={{ fov: 26, near: 0.1, far: 40, position: [0, 1.2, 5] }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}

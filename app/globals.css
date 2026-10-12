@@ -246,6 +246,7 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
   [data-wait] .spin-still { opacity: 0; transition-duration: 0s; }
   .kp-pin .hero-pin > section { position: sticky; top: 0; }
   .kp-pin .scroll-hint-hero { display: flex; }
+  .kp-pin .handoff-track { display: block; }
   .kp-pin .scroll-hint-sheet { display: none; }
 }
 .custom-panel { opacity: 0; transform: translateY(28px) scale(0.98); transition: opacity 360ms var(--e-settle), transform 600ms var(--e-settle); }

@@ -12,11 +12,13 @@ import { categories } from '@/lib/content';
 
 /*
  * Передача товаров из груза в каталог (shared element между WebGL и DOM).
- * Слой fixed поверх страницы повторяет камеру сцены груза, поэтому товар выходит ровно из короба.
+ * Canvas живёт в handoff-layer (sticky вместе с первым экраном, высотой в два экрана): груз и карточки
+ * каталога двигаются вместе с ним силами браузера, JS меняет только прогресс анимации.
  *   q 0.32…0.92  (экран закреплён) товары по очереди поднимаются из коробов и встают в ряд над грузом,
  *                в порядке каталога
  *   L 0.12…0.87  (лист каталога наезжает) каждый товар опускается в свою карточку, принимая её
  *                ракурс и размер; в момент посадки модель сменяется картинкой карточки
+ * q и L сглаживаются по времени: шаги колеса мыши превращаются в непрерывное движение.
  */
 const N = 6;
 const SLUGS = categories.slice(0, N).map((c) => c.slug);
@@ -36,31 +38,56 @@ const riseAt = (i: number) => 0.32 + i * 0.075;
 const landSpan = (i: number): [number, number] => [0.12 + i * 0.05, 0.62 + i * 0.05];
 /** Прогресс посадки: 0 — лист каталога у нижнего края экрана, 1 — каталог дошёл до верха. */
 const landing = (catalog: HTMLElement) => clamp01((innerHeight - catalog.getBoundingClientRect().top) / innerHeight);
+/** Та же постоянная сглаживания, что у сцены груза: оба слоя идут в ногу. */
+export const DAMP = 9;
 
-type Els = { slots: HTMLElement[]; catalog: HTMLElement; frame: HTMLElement };
+type Els = { slots: HTMLElement[]; cards: (HTMLElement | null)[]; catalog: HTMLElement; frame: HTMLElement };
 
-function Flights({ els }: { els: Els }) {
+function setWait(cards: Els['cards'], i: number, wait: boolean) {
+  const li = cards[i];
+  if (!li) return;
+  if (wait && !('wait' in li.dataset)) li.dataset.wait = '';
+  else if (!wait && 'wait' in li.dataset) delete li.dataset.wait;
+}
+
+function Flights({ els, onWarm }: { els: Els; onWarm: () => void }) {
   const { camera, gl, scene, size } = useThree();
   const items = useRef<(THREE.Group | null)[]>([]);
   const studio = useRef<THREE.Group>(null);
   const landedAt = useRef<number[]>(Array(N).fill(-1));
+  const smooth = useRef({ q: heroProgress.q, L: landing(els.catalog), frames: 0 });
   const v = useMemo(() => ({
     a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3(),
     up: new THREE.Vector3(0, 1, 0), m: new THREE.Matrix4(), q: new THREE.Quaternion(), qh: new THREE.Quaternion(), e: new THREE.Euler(),
     clip: [new THREE.Plane(new THREE.Vector3(0, 1, 0), -(STACK_TOP + 0.02))], none: [] as THREE.Plane[],
   }), []);
 
-  useFrame((s) => {
+  useFrame((s, dt) => {
     const sh = heroProgress;
+    const sm = smooth.current;
+    // прогрев: первые кадры рисуем все товары (крошечными) — шейдеры и текстуры готовы до скролла
+    if (sm.frames < 3) {
+      sm.frames++;
+      items.current.forEach((g) => { if (g) { g.visible = true; g.scale.setScalar(1e-4); } });
+      if (sm.frames === 3) onWarm();
+      return;
+    }
+
+    const cr = gl.domElement.getBoundingClientRect();
     const f = els.frame.getBoundingClientRect();
-    if (!sh.cam.ready || !f.width) return;
+    if (!sh.cam.ready || !f.width || !cr.height) return;
     const cam = camera as THREE.PerspectiveCamera;
     const W = size.width, H = size.height;
 
-    // камера груза, сдвинутая в текущее положение рамки hero-frame (рамка уезжает вверх вместе с экраном)
+    // рисуем только видимую часть высокого canvas
+    const top = Math.max(0, -cr.top), bottom = Math.min(cr.height, innerHeight - cr.top);
+    gl.setScissorTest(true);
+    gl.setScissor(0, H - bottom, W, Math.max(0, bottom - top));
+
+    // камера груза: рамка hero-frame в координатах этого canvas
     cam.fov = sh.cam.fov;
     cam.aspect = f.width / f.height;
-    cam.setViewOffset(f.width, f.height, -f.left, -f.top, W, H);
+    cam.setViewOffset(f.width, f.height, cr.left - f.left, cr.top - f.top, W, H);
     cam.position.fromArray(sh.cam.pos);
     cam.quaternion.fromArray(sh.cam.quat);
     cam.updateProjectionMatrix();
@@ -69,12 +96,14 @@ function Flights({ els }: { els: Els }) {
     const tanH = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
     const pxPerM = (dist: number) => f.height / (2 * dist * tanH);
     const toWorld = (px: number, py: number, dist: number, out: THREE.Vector3) =>
-      out.set((px / W) * 2 - 1, -(py / H) * 2 + 1, 0.5).unproject(cam).sub(cam.position).normalize().multiplyScalar(dist).add(cam.position);
+      out.set(((px - cr.left) / W) * 2 - 1, -((py - cr.top) / H) * 2 + 1, 0.5).unproject(cam).sub(cam.position).normalize().multiplyScalar(dist).add(cam.position);
 
-    const q = sh.q;
-    const L = landing(els.catalog);
+    const k = 1 - Math.exp(-dt * DAMP);
+    sm.q += (sh.q - sm.q) * k;
+    sm.L += (landing(els.catalog) - sm.L) * k;
+    const q = sm.q, L = sm.L;
     // пока товар внутри короба, всё ниже кромки срезано — он «вырастает» из полости
-    gl.clippingPlanes = L > 0 ? v.none : v.clip;
+    gl.clippingPlanes = L > 0.01 ? v.none : v.clip;
 
     const D = sh.cam.dist * 0.86;
     const r0 = els.slots[0].getBoundingClientRect(), r1 = els.slots[1].getBoundingClientRect();
@@ -93,8 +122,9 @@ function Flights({ els }: { els: Els }) {
       const land = span(L, la, lb);
       if (land < 1) landedAt.current[i] = -1;
       else if (landedAt.current[i] < 0) landedAt.current[i] = t;
-      // после посадки модель держится ещё 0,5 с, пока картинка карточки проявляется поверх
-      const show = rise > 0 && !(land >= 1 && t - landedAt.current[i] > 0.5);
+      // картинка карточки проявляется в момент посадки, модель держится под ней ещё 0,55 с
+      setWait(els.cards, i, land < 1);
+      const show = rise > 0 && !(land >= 1 && t - landedAt.current[i] > 0.55);
       g.visible = show;
       if (!show) continue;
 
@@ -106,8 +136,8 @@ function Flights({ els }: { els: Els }) {
       const sLand = r.width / LAB_FRAME_M / pxPerM(D);
 
       // ряд над грузом: тот же порядок, что на ленте каталога
-      const k = i - (N - 1) / 2;
-      toWorld(xLast - (N - 1 - i) * gap, f.top - f.height * 0.03 + k * k * 5, D, v.b);
+      const kk = i - (N - 1) / 2;
+      toWorld(xLast - (N - 1 - i) * gap, f.top - f.height * 0.03 + kk * kk * 5, D, v.b);
       const sRow = sLand * 0.55;
 
       const c = sh.cartons[i % 4];
@@ -148,27 +178,27 @@ function Flights({ els }: { els: Els }) {
 
 export default function HeroHandoff() {
   const [els, setEls] = useState<Els | null>(null);
+  const [target, setTarget] = useState<HTMLElement | null>(null);
   const [active, setActive] = useState(false);
+  const [warm, setWarm] = useState(true);
 
   useEffect(() => {
     const catalog = document.getElementById('catalog');
     const frame = document.querySelector<HTMLElement>('[data-hero-frame]');
+    const layer = document.querySelector<HTMLElement>('[data-handoff-layer]');
     const slots = [...document.querySelectorAll<HTMLElement>('#catalog .spin')].slice(0, N);
-    if (!catalog || !frame || slots.length < N) return;
-    setEls({ slots, catalog, frame });
+    if (!catalog || !frame || !layer || slots.length < N) return;
     const cards = slots.map((sl) => sl.closest('li'));
+    setEls({ slots, cards, catalog, frame });
+    setTarget(layer);
     let raf = 0;
     const update = () => {
       raf = 0;
-      const L = landing(catalog);
-      setActive(heroProgress.q > 0.2 && catalog.getBoundingClientRect().top > -innerHeight * 0.25);
-      // картинка карточки скрыта, пока её товар в полёте
-      cards.forEach((li, i) => {
-        if (!li) return;
-        const [la, lb] = landSpan(i);
-        if (span(L, la, lb) < 1) li.dataset.wait = '';
-        else delete li.dataset.wait;
-      });
+      const ct = catalog.getBoundingClientRect().top;
+      const on = heroProgress.q > 0.15 && ct > -innerHeight * 0.3;
+      setActive(on);
+      // вне активной зоны карточки в предсказуемом состоянии: наверху ждут товар, ниже — уже с картинкой
+      if (!on) cards.forEach((_, i) => setWait(cards, i, ct > 0));
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     addEventListener('scroll', onScroll, { passive: true });
@@ -178,16 +208,16 @@ export default function HeroHandoff() {
       removeEventListener('scroll', onScroll);
       removeEventListener('resize', onScroll);
       cancelAnimationFrame(raf);
-      cards.forEach((li) => li && delete li.dataset.wait);
+      cards.forEach((_, i) => setWait(cards, i, false));
     };
   }, []);
 
-  if (!els) return null;
+  if (!els || !target) return null;
   return createPortal(
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-30" style={{ visibility: active ? 'visible' : 'hidden' }}>
+    <div className="absolute inset-x-0 top-0 h-[200%]" style={{ visibility: active ? 'visible' : 'hidden' }}>
       <Canvas
-        dpr={[1, 1.5]}
-        frameloop={active ? 'always' : 'never'}
+        dpr={[1, 1.25]}
+        frameloop={active || warm ? 'always' : 'never'}
         camera={{ fov: 26, near: 0.1, far: 60 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         onCreated={({ gl }) => {
@@ -195,9 +225,9 @@ export default function HeroHandoff() {
           gl.toneMappingExposure = 1.05;
         }}
       >
-        <Flights els={els} />
+        <Flights els={els} onWarm={() => setWarm(false)} />
       </Canvas>
     </div>,
-    document.body,
+    target,
   );
 }

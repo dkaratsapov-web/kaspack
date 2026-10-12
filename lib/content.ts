@@ -6,6 +6,9 @@ export const company = {
   phone: '+7 (800) 550-40-08',
   phoneHref: 'tel:+78005504008',
   whatsappHref: 'https://wa.me/78005504008',
+  // ⚪ ссылки Telegram и MAX ждём от заказчика: пока null — кнопки показаны неактивными, без выдуманных аккаунтов
+  telegramHref: null as string | null,
+  maxHref: null as string | null,
   email: 'info@kaspack.ru',
   city: 'Тверь',
   address: 'Тверь, Старицкое шоссе, 15', // 🟡 по 2ГИС, сверить с заказчиком

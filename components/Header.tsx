@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { company, nav } from '@/lib/content';
 import { Logo } from './Logo';
 import { LeadButton } from './LeadButton';
+import { Messengers } from './Messengers';
 
 // Прилипающая шапка (бриф С12). После первого экрана становится компактнее и получает разделитель.
 export function Header() {
@@ -68,6 +69,7 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <Messengers className="hidden xl:flex" />
             <a href={company.phoneHref} className="hidden text-[15px] font-semibold tabular md:block" data-goal="tel_click">
               {company.phone}
             </a>
@@ -111,6 +113,7 @@ export function Header() {
           <div className="mt-8 grid gap-3">
             <LeadButton source="menu" onBeforeOpen={() => setOpen(false)}>Рассчитать заказ</LeadButton>
             <a href={company.phoneHref} className="btn btn-ghost tabular">{company.phone}</a>
+            <Messengers size="lg" className="mt-2 justify-center gap-3" />
           </div>
         </div>
       )}
