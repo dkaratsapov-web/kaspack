@@ -6,19 +6,23 @@ import { ContactShadows } from '@react-three/drei';
 import { Studio } from './Studio';
 import * as THREE from 'three';
 import { LoadedPallet, STACK_TOP, TOP_CARTONS, type PalletState } from './LoadedPallet';
-import HeroHandoff, { DAMP } from './HeroHandoff';
+import HeroHandoff from './HeroHandoff';
+import { StageDriver } from './StageDriver';
 import { heroProgress } from '@/lib/heroProgress';
+
+// в сцене груз рисуется, пока первый экран не растворился полностью
+const heroShown = () => heroProgress.q < 0.63;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const span = (q: number, a: number, b: number) => clamp01((q - a) / (b - a));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 /*
- * Хореография по скроллу закреплённого первого экрана, q 0…1:
- *   0.00–0.16  плёнка сматывается
- *   0.08–0.24  лента и уголки уходят вверх
- *   0.16–0.36  клапаны верхних коробов раскрываются, камера заглядывает сверху
- * Дальше товары поднимаются из коробов и садятся в карточки каталога — это слой HeroHandoff.
+ * Груз в сцене «первый экран → каталог» (q 0…1, см. HeroCatalogStage):
+ *   0.00–0.10  плёнка сматывается
+ *   0.04–0.14  лента и уголки уходят вверх
+ *   0.09–0.22  клапаны верхних коробов раскрываются, камера заглядывает сверху
+ * Дальше товары выезжают из коробов и встают на ленту каталога — это слой HeroHandoff.
  */
 type Frame = { target: THREE.Vector3; dist: number };
 
@@ -26,7 +30,6 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
   const group = useRef<THREE.Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
   const start = useRef<number | null>(null);
-  const qs = useRef(heroProgress.q);
   const frame = useRef<Frame>({ target: new THREE.Vector3(0, STACK_TOP * 0.47, 0), dist: 5 });
   const { camera, size, gl } = useThree();
   const tmp = useMemo(() => ({ a: new THREE.Vector3(), dir: new THREE.Vector3() }), []);
@@ -61,13 +64,12 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
     if (!group.current || !state.current) return;
     if (start.current === null) start.current = s.clock.elapsedTime;
     const t = s.clock.elapsedTime - start.current;
-    // прогресс сглажен по времени (та же постоянная, что у слоя товаров): шаги колеса не дёргают сцену
-    qs.current += ((reduced ? 0 : heroProgress.q) - qs.current) * (1 - Math.exp(-dt * DAMP));
-    const q = qs.current;
+    // прогресс уже сглажен сценой HeroCatalogStage
+    const q = reduced ? 0 : heroProgress.q;
     const cam = camera as THREE.PerspectiveCamera;
 
     // камера: с ростом q поднимается и чуть отъезжает — видно, как раскрываются короба
-    const look = smooth(span(q, 0.12, 0.4));
+    const look = smooth(span(q, 0.06, 0.3));
     const { target, dist } = frame.current;
     tmp.dir.set(0, 0.38 + 0.2 * look, 1).normalize();
     cam.position.copy(target).addScaledVector(tmp.dir, dist * (1 + 0.22 * look));
@@ -75,9 +77,9 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
 
     // намотка плёнки после интро; скролл сматывает её обратно
     const intro = reduced ? 1 : clamp01((t - 0.9) / 2.6);
-    state.current.wrap = Math.min(intro, 1 - smooth(span(q, 0, 0.16)));
-    state.current.strip = span(q, 0.08, 0.24);
-    state.current.open = span(q, 0.16, 0.36);
+    state.current.wrap = Math.min(intro, 1 - smooth(span(q, 0, 0.1)));
+    state.current.strip = span(q, 0.04, 0.14);
+    state.current.open = span(q, 0.09, 0.22);
 
     const k = 1 - Math.pow(0.001, dt); // демпфирование, не зависит от FPS
     const yaw = -0.6 + 0.22 * look + (reduced ? 0 : Math.sin(t * 0.22) * 0.1 * (1 - look) + pointer.current.x * 0.22);
@@ -132,7 +134,7 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
     <div ref={wrap} className="absolute inset-0">
       <Canvas
         dpr={[1, pinned ? 1.5 : 1.75]}
-        frameloop={visible ? 'always' : 'never'}
+        frameloop={pinned ? 'never' : visible ? 'always' : 'never'}
         camera={{ fov: 26, near: 0.1, far: 40, position: [0, 1.2, 5] }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         onCreated={({ gl }) => {
@@ -144,6 +146,7 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
         <Suspense fallback={null}>
           <Studio />
           <Rig state={state} reduced={reduced} />
+          {pinned && <StageDriver when={heroShown} />}
           <ContactShadows position={[0, 0, 0]} opacity={0.55} scale={4.5} blur={2.4} far={1.6} resolution={512} color="#2b3a00" />
         </Suspense>
       </Canvas>

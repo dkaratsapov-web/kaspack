@@ -1,16 +1,14 @@
 import { HeroVisual } from './HeroVisual';
-import { HeroPin } from './HeroPin';
 import { ChevronField } from './backgrounds/ChevronField';
 import { LeadForm } from './LeadForm';
 import { HeroUsp } from './HeroUsp';
 
 // Hero v2 (frontend-design: «типографика как картинка»; премиум-корпус: fizzi/tripletta — объект перекрывает буквы).
 // Слои: лаймовое поле → гигантские слова → 3D-груз (canvas) → форма.
-// v4: на десктопе экран залипает, скролл раскрывает груз и выпускает из коробов товары каталога.
+// v4: на десктопе экран — часть сцены HeroCatalogStage: груз раскрывается, подложка растворяется, товары встают на ленту каталога.
 export function Hero() {
   return (
-    <HeroPin>
-      <section aria-labelledby="hero-title" className="field-lime grain relative isolate overflow-hidden pt-[var(--header-h)]">
+    <section data-stage-hero aria-labelledby="hero-title" className="field-lime grain relative isolate overflow-hidden pt-[var(--header-h)]">
         <ChevronField />
         <div className="wrap relative min-h-[max(calc(100svh-var(--header-h)),700px)]">
           <h1 id="hero-title" className="giant giant-rise relative z-0 pt-[clamp(1rem,3vh,2.5rem)] text-[11.4vw] lg:text-[min(8.7vw,15.5vh,11rem)] text-ink">
@@ -36,11 +34,10 @@ export function Hero() {
         </div>
 
         {/* подсказка на время закрепления; гаснет с первыми пикселями скролла */}
-        <p aria-hidden="true" className="scroll-hint-hero pointer-events-none absolute inset-x-0 bottom-5 z-20 items-center justify-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/75" style={{ opacity: 'calc(1 - var(--hq, 0) * 12)' }}>
+        <p aria-hidden="true" className="scroll-hint-hero pointer-events-none absolute inset-x-0 bottom-5 z-20 items-center justify-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/75">
           Листайте вниз
           <svg viewBox="0 0 190 88" className="scroll-cue h-2.5 w-4 text-ink"><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
         </p>
-      </section>
-    </HeroPin>
+    </section>
   );
 }

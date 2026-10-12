@@ -238,16 +238,21 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 .custom-card[data-open='true'] > div > div { opacity: 1; transform: none; }
 .custom-card-img { transform: rotate(-6deg) translateY(10px); transition: transform 700ms var(--e-settle); }
 .custom-card[data-open='true'] .custom-card-img { transform: rotate(0) translateY(0); }
-/* Первый экран: закрепление на время раскрытия груза (класс kp-pin ставит boot-скрипт) */
 .scroll-hint-hero { display: none; }
+.handoff-layer { display: none; }
+/* Сцена «первый экран → каталог»: один закреплённый экран, три слоя (HeroCatalogStage) */
 @media (min-width: 1024px) {
-  .kp-pin .hero-pin { min-height: 220svh; }
+  .kp-pin .stage-view { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .kp-pin .stage-view > section { position: absolute; inset: 0; height: 100svh; margin: 0; border-radius: 0; animation: none; }
+  .kp-pin .stage-view > [data-stage-hero] { z-index: 20; }
+  .kp-pin .stage-view > [data-catalog] { z-index: 10; }
+  .kp-pin .handoff-layer { display: block; position: absolute; inset: 0; z-index: 30; pointer-events: none; }
+  .kp-pin .scroll-hint-hero { display: flex; }
+  .kp-pin .scroll-hint-sheet { display: none; }
+  /* заголовок «подъезжает» справа, подписи и лента проявляются — значения пишет цикл HeroCatalogStage */
+  .stage[data-staged] [data-stage-title] { will-change: transform, opacity; }
   /* карточка ждёт, пока её товар прилетит из груза (HeroHandoff) */
   [data-wait] .spin-still { opacity: 0; transition-duration: 0s; }
-  .kp-pin .hero-pin > section { position: sticky; top: 0; }
-  .kp-pin .scroll-hint-hero { display: flex; }
-  .kp-pin .handoff-track { display: block; }
-  .kp-pin .scroll-hint-sheet { display: none; }
 }
 .custom-panel { opacity: 0; transform: translateY(28px) scale(0.98); transition: opacity 360ms var(--e-settle), transform 600ms var(--e-settle); }
 .custom-panel[data-on='true'] { opacity: 1; transform: none; transition-delay: 80ms; }

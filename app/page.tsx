@@ -1,5 +1,6 @@
 import { Hero } from '@/components/Hero';
 import { Catalog } from '@/components/sections/Catalog';
+import { HeroCatalogStage } from '@/components/HeroCatalogStage';
 import { Explode } from '@/components/sections/Explode';
 import { Custom } from '@/components/sections/Custom';
 import { Production } from '@/components/sections/Production';
@@ -17,8 +18,10 @@ import { BoneDrift } from '@/components/backgrounds/BoneDrift';
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <Catalog />
+      <HeroCatalogStage>
+        <Hero />
+        <Catalog />
+      </HeroCatalogStage>
       <Explode />
       <Custom />
       <Production />
