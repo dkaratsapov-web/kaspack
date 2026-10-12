@@ -238,6 +238,14 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 .custom-card[data-open='true'] > div > div { opacity: 1; transform: none; }
 .custom-card-img { transform: rotate(-6deg) translateY(10px); transition: transform 700ms var(--e-settle); }
 .custom-card[data-open='true'] .custom-card-img { transform: rotate(0) translateY(0); }
+/* Первый экран: закрепление на время раскрытия груза (класс kp-pin ставит boot-скрипт) */
+.scroll-hint-hero { display: none; }
+@media (min-width: 1024px) {
+  .kp-pin .hero-pin { min-height: 240svh; }
+  .kp-pin .hero-pin > section { position: sticky; top: 0; }
+  .kp-pin .scroll-hint-hero { display: flex; }
+  .kp-pin .scroll-hint-sheet { display: none; }
+}
 .custom-panel { opacity: 0; transform: translateY(28px) scale(0.98); transition: opacity 360ms var(--e-settle), transform 600ms var(--e-settle); }
 .custom-panel[data-on='true'] { opacity: 1; transform: none; transition-delay: 80ms; }
 .custom-panel[data-on='true'] .custom-card-img { transform: rotate(0) translateY(0); }

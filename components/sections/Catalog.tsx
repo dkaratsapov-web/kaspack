@@ -54,7 +54,7 @@ export function Catalog() {
       style={height ? { height } : undefined}
     >
       {/* подсказка на кромке листа: видна под первым экраном, уходит вместе со скроллом */}
-      <p aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-2.5 z-20 hidden items-center justify-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink-soft lg:flex">
+      <p aria-hidden="true" className="scroll-hint-sheet pointer-events-none absolute inset-x-0 top-2.5 z-20 hidden items-center justify-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink-soft lg:flex">
         Листайте вниз
         <svg viewBox="0 0 190 88" className="scroll-cue h-2.5 w-4 text-ink"><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
       </p>

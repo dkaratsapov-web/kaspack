@@ -11,7 +11,12 @@ import { kraftTextures, stampTexture, woodTextures } from './textures';
 export const W = 1.2, D = 0.8, PH = 0.144, BH = 0.3, TIERS = 3;
 export const STACK_TOP = PH + BH * TIERS;
 
-export type PalletState = { wrap: number; explode: number };
+/** wrap — намотка плёнки, explode — разбор по слоям; open — клапаны верхних коробов, strip — лента и уголки улетают вверх. */
+export type PalletState = { wrap: number; explode: number; open?: number; strip?: number };
+
+/** Центры верхних коробов (локальные координаты груза) — отсюда вылетают товары в hero. */
+export const TOP_CARTONS: [number, number, number][] = [[-0.3, STACK_TOP, 0.2], [0.3, STACK_TOP, 0.2], [-0.3, STACK_TOP, -0.2], [0.3, STACK_TOP, -0.2]];
+const CW = 0.594, CD = 0.394;
 
 /** Насколько поднимается каждый слой при разборе (м). */
 export const EXPLODE_OFFSET: Record<string, number> = {
@@ -26,6 +31,8 @@ function useMaterials() {
     const woodMap = wood.map; woodMap.repeat.set(1, 1);
     return {
       kraft: new THREE.MeshStandardMaterial({ map: kraftMap, bumpMap: kraft.bump, bumpScale: 0.6, roughness: 0.86, color: '#ffffff' }),
+      flap: new THREE.MeshStandardMaterial({ map: kraftMap, roughness: 0.88, color: '#f4e6cc', side: THREE.DoubleSide }),
+      hollow: new THREE.MeshStandardMaterial({ color: '#24190d', roughness: 1 }),
       tape: new THREE.MeshPhysicalMaterial({ color: '#a8824f', roughness: 0.28, clearcoat: 0.6, clearcoatRoughness: 0.3, transparent: true, opacity: 0.88 }),
       wood: new THREE.MeshStandardMaterial({ map: woodMap, roughness: 0.92, color: '#f3e3c2' }),
       woodEnd: new THREE.MeshStandardMaterial({ map: woodMap, roughness: 0.95, color: '#d9c294' }),
@@ -66,12 +73,41 @@ function Pallet({ m }: { m: M }) {
   return <group>{parts}</group>;
 }
 
-function Carton({ position, m, stamp }: { position: [number, number, number]; m: M; stamp: boolean }) {
+/** Клапаны верхнего короба: петли по кромкам, раскрываются наружу. */
+export type Lid = { front: THREE.Group | null; back: THREE.Group | null; left: THREE.Group | null; right: THREE.Group | null; tape: THREE.Mesh | null; hollow: THREE.Mesh | null };
+
+function Flaps({ m, lid }: { m: M; lid: Lid }) {
+  const y = BH / 2 - 0.003 + 0.002;
+  const major = CD / 2, minor = 0.13;
+  return (
+    <group position-y={y}>
+      {/* «дно» открытого короба: тёмная полость под клапанами */}
+      <mesh ref={(o) => { lid.hollow = o; }} material={m.hollow} rotation-x={-Math.PI / 2} position-y={0.0008} visible={false}>
+        <planeGeometry args={[CW - 0.03, CD - 0.03]} />
+      </mesh>
+      <group ref={(o) => { lid.right = o; }} position={[CW / 2 - 0.004, 0.001, 0]}>
+        <mesh material={m.flap} position={[-minor / 2, 0, 0]}><boxGeometry args={[minor, 0.003, CD - 0.02]} /></mesh>
+      </group>
+      <group ref={(o) => { lid.left = o; }} position={[-CW / 2 + 0.004, 0.001, 0]}>
+        <mesh material={m.flap} position={[minor / 2, 0, 0]}><boxGeometry args={[minor, 0.003, CD - 0.02]} /></mesh>
+      </group>
+      <group ref={(o) => { lid.front = o; }} position={[0, 0.004, CD / 2 - 0.002]}>
+        <mesh material={m.flap} position={[0, 0, -major / 2]}><boxGeometry args={[CW - 0.006, 0.003, major - 0.002]} /></mesh>
+      </group>
+      <group ref={(o) => { lid.back = o; }} position={[0, 0.004, -CD / 2 + 0.002]}>
+        <mesh material={m.flap} position={[0, 0, major / 2]}><boxGeometry args={[CW - 0.006, 0.003, major - 0.002]} /></mesh>
+      </group>
+    </group>
+  );
+}
+
+function Carton({ position, m, stamp, lid }: { position: [number, number, number]; m: M; stamp: boolean; lid?: Lid }) {
   return (
     <group position={position}>
-      <RoundedBox args={[0.594, BH - 0.006, 0.394]} radius={0.01} smoothness={3} material={m.kraft} castShadow receiveShadow />
+      <RoundedBox args={[CW, BH - 0.006, CD]} radius={0.01} smoothness={3} material={m.kraft} castShadow receiveShadow />
+      {lid && <Flaps m={m} lid={lid} />}
       {/* скотч по шву клапанов и загибы на торцы */}
-      <mesh material={m.tape} position={[0, BH / 2 - 0.002, 0]}>
+      <mesh ref={lid ? (o) => { lid.tape = o; } : undefined} material={m.tape} position={[0, BH / 2 + (lid ? 0.007 : -0.002), 0]}>
         <boxGeometry args={[0.6, 0.002, 0.048]} />
       </mesh>
       <mesh material={m.tape} position={[0.298, BH / 2 - 0.04, 0]}>
@@ -89,13 +125,11 @@ function Carton({ position, m, stamp }: { position: [number, number, number]; m:
   );
 }
 
-function Tier({ t, m }: { t: number; m: M }) {
+function Tier({ t, m, lids }: { t: number; m: M; lids?: Lid[] }) {
   const y = PH + t * BH + BH / 2;
   return (
     <group>
-      {[-0.3, 0.3].map((x) =>
-        [-0.2, 0.2].map((z) => <Carton key={`${x}${z}`} position={[x, y, z]} m={m} stamp={z > 0} />),
-      )}
+      {TOP_CARTONS.map(([x, , z], i) => <Carton key={`${x}${z}`} position={[x, y, z]} m={m} stamp={z > 0} lid={lids?.[i]} />)}
     </group>
   );
 }
@@ -167,6 +201,7 @@ export function LoadedPallet({ state }: { state: React.RefObject<PalletState> })
   const { geo, total } = useFilmGeometry();
   const layers = useRef<Record<string, THREE.Group | null>>({});
   const lastWrap = useRef(-1);
+  const lids = useMemo<Lid[]>(() => TOP_CARTONS.map(() => ({ front: null, back: null, left: null, right: null, tape: null, hollow: null })), []);
 
   useFrame(() => {
     const s = state.current;
@@ -177,7 +212,24 @@ export function LoadedPallet({ state }: { state: React.RefObject<PalletState> })
       g.position.y = EXPLODE_OFFSET[k] * e;
     }
     if (layers.current.film) layers.current.film.rotation.y = -0.22 * e;
-    if (layers.current.strap) layers.current.strap.rotation.y = 0.1 * e;
+    if (layers.current.strap) {
+      const st = smooth(Math.min(1, Math.max(0, s.strip ?? 0)));
+      layers.current.strap.rotation.y = 0.1 * e + 0.35 * st;
+      layers.current.strap.position.y += 2.4 * st;
+      layers.current.strap.visible = st < 0.999;
+    }
+    // клапаны: сначала малые (торцевые), затем большие; у каждого короба свой сдвиг по времени
+    const open = s.open ?? 0;
+    lids.forEach((l, i) => {
+      const o = Math.min(1, Math.max(0, open * 1.35 - i * 0.09));
+      const minor = smooth(Math.min(1, o / 0.6)), major = smooth(Math.min(1, Math.max(0, (o - 0.25) / 0.75)));
+      if (l.right) l.right.rotation.z = -minor * 2.05;
+      if (l.left) l.left.rotation.z = minor * 2.05;
+      if (l.front) l.front.rotation.x = major * 2.25;
+      if (l.back) l.back.rotation.x = -major * 2.25;
+      if (l.tape) l.tape.visible = o < 0.02;
+      if (l.hollow) l.hollow.visible = o > 0.02;
+    });
     const w = Math.round(ease(Math.min(1, Math.max(0, s.wrap))) * total);
     if (w !== lastWrap.current) { geo.setDrawRange(0, w * 6); lastWrap.current = w; }
   });
@@ -188,7 +240,7 @@ export function LoadedPallet({ state }: { state: React.RefObject<PalletState> })
       <group ref={ref('pallet')}><Pallet m={m} /><group name="anchor-pallet" position={[W / 2, 0.07, D / 2]} /></group>
       <group ref={ref('tier1')}><Tier t={0} m={m} /></group>
       <group ref={ref('tier2')}><Tier t={1} m={m} /></group>
-      <group ref={ref('tier3')}><Tier t={2} m={m} /><group name="anchor-tier" position={[W / 2, PH + BH * 2.5, D / 2]} /></group>
+      <group ref={ref('tier3')}><Tier t={2} m={m} lids={lids} /><group name="anchor-tier" position={[W / 2, PH + BH * 2.5, D / 2]} /></group>
       <group ref={ref('strap')}><Strapping m={m} /><group name="anchor-strap" position={[0.32, STACK_TOP, D / 2]} /></group>
       <group ref={ref('film')}>
         <mesh geometry={geo} material={m.film} renderOrder={2} />
