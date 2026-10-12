@@ -238,10 +238,14 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 .custom-card[data-open='true'] > div > div { opacity: 1; transform: none; }
 .custom-card-img { transform: rotate(-6deg) translateY(10px); transition: transform 700ms var(--e-settle); }
 .custom-card[data-open='true'] .custom-card-img { transform: rotate(0) translateY(0); }
+.custom-panel { opacity: 0; transform: translateY(28px) scale(0.98); transition: opacity 360ms var(--e-settle), transform 600ms var(--e-settle); }
+.custom-panel[data-on='true'] { opacity: 1; transform: none; transition-delay: 80ms; }
+.custom-panel[data-on='true'] .custom-card-img { transform: rotate(0) translateY(0); }
 
 @media (prefers-reduced-motion: no-preference) {
   /* бесшовные дрейфы: сдвиг ровно на размер плитки → шва нет */
   .chevron-drift { animation: chevronDrift 22s linear infinite; }
+  .scroll-cue { animation: scrollCue 1.6s var(--e-settle) infinite; }
   .flute-drift { animation: fluteDrift 26s linear infinite; }
 
   @supports (animation-timeline: view()) {
@@ -262,6 +266,7 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 @keyframes depth1 { from { transform: translateY(30vh) rotate(-8deg); } to { transform: translateY(-60vh) rotate(6deg); } }
 @keyframes depth2 { from { transform: translateY(10vh) rotate(4deg); } to { transform: translateY(-30vh) rotate(-6deg); } }
 @keyframes depth3 { from { transform: translateY(50vh) rotate(10deg); } to { transform: translateY(-90vh) rotate(-4deg); } }
+@keyframes scrollCue { 0%, 100% { transform: translateY(-2px); opacity: .55; } 50% { transform: translateY(3px); opacity: 1; } }
 @keyframes roadDash { from { background-position-x: 0; } to { background-position-x: -900px; } }
 
 /* Единый контейнер сайта: шире (до 1760px), поля по краям растут с экраном */
