@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { LabelRefs } from '@/components/three/ExplodeScene';
-import { FilmShader } from '../backgrounds/FilmShader';
+import { Blueprint } from '../backgrounds/Blueprint';
 import { EXPLODE_OFFSET, STACK_TOP, type PalletState } from '@/components/three/LoadedPallet';
 import { LeadButton } from '@/components/LeadButton';
 
@@ -27,12 +27,13 @@ const CHAPTERS = [
 const BASE_MM = Math.round(STACK_TOP * 1000);
 const SPREAD_MM = Math.round(EXPLODE_OFFSET.film * 1000);
 
-// Кульминация v2: графитовое поле, закреплённая сцена, гигантское слово-глава и счётчик высоты в мм.
+// Кульминация v2: графитовое поле-чертёж (миллиметровка + разметка слоёв), закреплённая сцена, гигантское слово-глава и счётчик высоты в мм.
 export function Explode() {
   const section = useRef<HTMLElement>(null);
   const readout = useRef<HTMLSpanElement>(null);
   const state = useRef<PalletState>({ wrap: 1, explode: 0 });
   const labels = useRef<LabelRefs>({ film: null, strap: null, tier: null, pallet: null });
+  const guides = useRef<LabelRefs>({ film: null, strap: null, tier: null, pallet: null });
   const [mount, setMount] = useState(false);
   const [chapter, setChapter] = useState(0);
   const [interactive, setInteractive] = useState(true);
@@ -80,7 +81,13 @@ export function Explode() {
   return (
     <section ref={section} id="explode" aria-labelledby="explode-title" className="chapter field-graphite on-dark lg:h-[340vh]">
       <div className="relative isolate overflow-hidden lg:sticky lg:top-0 lg:h-[100svh]">
-        <FilmShader />
+        <Blueprint />
+        {/* разметка слоёв: пунктир на высоте каждого слоя, едет вместе с ним */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 hidden lg:block">
+          {LAYERS.map((l) => (
+            <div key={l.key} ref={(el) => { guides.current[l.key] = el; }} data-on="false" className="explode-guide absolute left-[36%] right-0 top-0 h-px" />
+          ))}
+        </div>
         {/* слово-глава: верхняя полоса над грузом, справа от колонки с текстом — заголовок всегда читается целиком */}
         <p
           aria-hidden="true"
@@ -114,7 +121,7 @@ export function Explode() {
           </div>
 
           <div className="relative -mx-5 h-[min(115vw,600px)] md:-mx-10 lg:col-span-6 lg:mx-0 lg:h-full">
-            {interactive && mount && <ExplodeScene state={state} labels={labels} />}
+            {interactive && mount && <ExplodeScene state={state} labels={labels} guides={guides} />}
             <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
               {LAYERS.map((l) => (
                 <div key={l.key} ref={(el) => { labels.current[l.key] = el; }} data-on="false" className="explode-label absolute left-0 top-0">

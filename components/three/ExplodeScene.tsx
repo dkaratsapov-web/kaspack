@@ -11,7 +11,7 @@ export type LabelRefs = Record<'film' | 'strap' | 'tier' | 'pallet', HTMLElement
 /** Порог разбора, после которого выноска слоя появляется. */
 const SHOW_AT: Record<keyof LabelRefs, number> = { film: 0.18, strap: 0.38, tier: 0.58, pallet: 0.75 };
 
-function Rig({ state, labels }: { state: React.RefObject<PalletState>; labels: React.RefObject<LabelRefs> }) {
+function Rig({ state, labels, guides }: { state: React.RefObject<PalletState>; labels: React.RefObject<LabelRefs>; guides?: React.RefObject<LabelRefs> }) {
   const group = useRef<THREE.Group>(null);
   const { camera, size, scene } = useThree();
   const v = useRef(new THREE.Vector3());
@@ -49,6 +49,12 @@ function Rig({ state, labels }: { state: React.RefObject<PalletState>; labels: R
       const on = e > SHOW_AT[k];
       el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
       el.dataset.on = on ? 'true' : 'false';
+      // разметочная линия фона — на той же высоте, что и выноска
+      const g = guides?.current?.[k];
+      if (g) {
+        g.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
+        g.dataset.on = el.dataset.on;
+      }
     });
   });
 
@@ -59,7 +65,7 @@ function Rig({ state, labels }: { state: React.RefObject<PalletState>; labels: R
   );
 }
 
-export default function ExplodeScene({ state, labels }: { state: React.RefObject<PalletState>; labels: React.RefObject<LabelRefs> }) {
+export default function ExplodeScene({ state, labels, guides }: { state: React.RefObject<PalletState>; labels: React.RefObject<LabelRefs>; guides?: React.RefObject<LabelRefs> }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -81,7 +87,7 @@ export default function ExplodeScene({ state, labels }: { state: React.RefObject
       >
         <Suspense fallback={null}>
           <Studio dark />
-          <Rig state={state} labels={labels} />
+          <Rig state={state} labels={labels} guides={guides} />
           <ContactShadows position={[0, 0, 0]} opacity={0.65} scale={5} blur={2.6} far={2} resolution={512} color="#000000" />
         </Suspense>
       </Canvas>
