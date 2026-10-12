@@ -20,9 +20,9 @@ export function Hero() {
             <span className="sr-only">: от поддона до плёнки</span>
           </h1>
 
-          {/* 3D-груз поверх букв. На десктопе canvas во весь экран (товары разлетаются над заголовком),
-              а сам груз кадрируется в рамку hero-frame справа. */}
-          <div className="pointer-events-none relative z-10 -mx-5 -my-4 h-[88vw] max-h-[520px] md:-mx-10 lg:absolute lg:bottom-0 lg:left-[calc(50%-50vw)] lg:top-[calc(-1*var(--header-h))] lg:m-0 lg:h-auto lg:max-h-none lg:w-[100vw]" aria-hidden="true">
+          {/* 3D-груз поверх букв. hero-frame — та же рамка без canvas: по ней слой товаров
+              (fixed поверх страницы) повторяет камеру груза. */}
+          <div className="pointer-events-none relative z-10 -mx-5 -my-4 h-[88vw] max-h-[520px] md:-mx-10 lg:absolute lg:inset-auto lg:bottom-[-2%] lg:left-[50%] lg:right-[-3%] lg:top-[19%] lg:m-0 lg:h-auto lg:max-h-none" aria-hidden="true">
             <HeroVisual />
           </div>
           <div data-hero-frame aria-hidden="true" className="pointer-events-none hidden lg:absolute lg:bottom-[-2%] lg:left-[50%] lg:right-[-3%] lg:top-[19%] lg:block" />

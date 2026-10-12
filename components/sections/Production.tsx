@@ -3,7 +3,7 @@ import { BoneDrift } from '../backgrounds/BoneDrift';
 
 const DIRECTIONS = ['Стрейч-плёнка', 'Переработка гранул ПНД и ПВД', 'Поддоны', 'Гофрокартон', 'Этикетки', 'Метизы'];
 
-// Производство v2: графитовое поле, реальные видео во всю ширину, направления крупным списком.
+// Производство v2: оба видео горизонтальные — две равные колонки 16:9 без обрезки, направления крупным списком.
 export function Production() {
   return (
     <section id="production" aria-labelledby="production-title" className="chapter field-bone isolate overflow-hidden">
@@ -15,12 +15,12 @@ export function Production() {
         </div>
 
         <div className="mt-14 grid gap-3 md:grid-cols-12">
-          <figure className="reveal relative overflow-hidden rounded-[18px] md:col-span-8">
+          <figure className="reveal relative overflow-hidden rounded-[18px] md:col-span-6">
             <div className="aspect-[16/9]"><InViewVideo src="/video/pallets.mp4" poster="/video/pallets.webp" label="Цех производства поддонов Kaspack" /></div>
             <figcaption className="absolute bottom-4 left-4 font-display text-[clamp(1.2rem,2vw,1.8rem)] font-bold tracking-[-0.03em] text-white [text-shadow:0_2px_24px_rgb(0_0_0/0.5)]">Цех поддонов</figcaption>
           </figure>
-          <figure className="reveal relative overflow-hidden rounded-[18px] md:col-span-4">
-            <div className="aspect-[16/9] md:aspect-auto md:h-full"><InViewVideo src="/video/corrugated.mp4" poster="/video/corrugated.webp" label="Линия производства гофрокартона Kaspack" /></div>
+          <figure className="reveal relative overflow-hidden rounded-[18px] md:col-span-6">
+            <div className="aspect-[16/9]"><InViewVideo src="/video/corrugated.mp4" poster="/video/corrugated.webp" label="Линия производства гофрокартона Kaspack" /></div>
             <figcaption className="absolute bottom-4 left-4 font-display text-[clamp(1.2rem,2vw,1.8rem)] font-bold tracking-[-0.03em] text-white [text-shadow:0_2px_24px_rgb(0_0_0/0.5)]">Гофролиния</figcaption>
           </figure>
         </div>

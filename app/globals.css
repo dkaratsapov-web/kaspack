@@ -241,7 +241,9 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 /* Первый экран: закрепление на время раскрытия груза (класс kp-pin ставит boot-скрипт) */
 .scroll-hint-hero { display: none; }
 @media (min-width: 1024px) {
-  .kp-pin .hero-pin { min-height: 240svh; }
+  .kp-pin .hero-pin { min-height: 220svh; }
+  /* карточка ждёт, пока её товар прилетит из груза (HeroHandoff) */
+  [data-wait] .spin-still { opacity: 0; transition-duration: 0s; }
   .kp-pin .hero-pin > section { position: sticky; top: 0; }
   .kp-pin .scroll-hint-hero { display: flex; }
   .kp-pin .scroll-hint-sheet { display: none; }

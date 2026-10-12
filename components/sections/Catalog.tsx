@@ -83,7 +83,7 @@ export function Catalog() {
                       height={480}
                       loading={i < 4 ? 'eager' : 'lazy'}
                       decoding="async"
-                      className="spin-still absolute inset-0 h-full w-full object-contain transition-transform duration-500 [transition-timing-function:var(--e-settle)] group-hover:-translate-y-2"
+                      className="spin-still absolute inset-0 h-full w-full object-contain transition-[transform,opacity] duration-500 [transition-timing-function:var(--e-settle)] group-hover:-translate-y-2"
                     />
                     <span aria-hidden="true" className="spin-sprite absolute inset-0" style={{ ['--spin' as string]: `url(${asset(`/catalog/${c.slug}-spin.webp`)})` }} />
                   </div>
