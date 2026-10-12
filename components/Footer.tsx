@@ -5,7 +5,7 @@ import { Logo } from './Logo';
 export function Footer() {
   return (
     <footer className="on-dark relative overflow-hidden bg-[#16181c] text-graphite-ink">
-      <div className="mx-auto grid max-w-[1360px] gap-10 px-5 py-16 md:grid-cols-12 md:px-8">
+      <div className="wrap grid gap-10 py-16 md:grid-cols-12">
         <div className="md:col-span-5">
           <Logo tone="light" />
           <p className="mt-5 max-w-[40ch] text-[15px] text-graphite-soft">
@@ -26,7 +26,7 @@ export function Footer() {
       {/* вордмарк во всю ширину: тот же Unbounded, что несёт всю страницу */}
       <p aria-hidden="true" className="giant select-none px-3 text-center text-[17.6vw] leading-[0.8] text-lime/90 normal-case">kaspack</p>
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-3 px-5 py-6 text-[13px] text-graphite-soft md:flex-row md:items-center md:justify-between md:px-8">
+        <div className="wrap flex flex-col gap-3 py-6 text-[13px] text-graphite-soft md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} {company.legalName} · ИНН {company.inn}</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link href="/politika-obrabotki-personalnyh-dannyh" className="hover:text-white">Политика обработки персональных данных</Link>

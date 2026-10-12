@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { company } from '@/lib/content';
+import { LeadButton } from './LeadButton';
 
 // Нижняя панель на телефоне после первого экрана: «Позвонить» и «Рассчитать».
 export function MobileBar() {
@@ -25,7 +26,7 @@ export function MobileBar() {
     >
       <div className="grid grid-cols-2 gap-3">
         <a href={company.phoneHref} className="btn btn-ghost !min-h-[48px]" tabIndex={show ? 0 : -1} data-goal="cta_sticky_call">Позвонить</a>
-        <a href="#calc" className="btn btn-primary !min-h-[48px]" tabIndex={show ? 0 : -1} data-goal="cta_sticky_mobile">Рассчитать</a>
+        <LeadButton source="sticky_mobile" className="btn btn-primary !min-h-[48px]">Рассчитать</LeadButton>
       </div>
     </div>
   );

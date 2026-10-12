@@ -3,7 +3,7 @@ import Link from 'next/link';
 // Блок-ссылка для дилеров и оптовиков (бриф, решение 7).
 export function Dealers() {
   return (
-    <section aria-labelledby="dealers-title" className="mx-auto max-w-[1360px] px-5 md:px-8">
+    <section aria-labelledby="dealers-title" className="wrap">
       <div className="reveal grid items-center gap-6 rounded-[24px] bg-ink p-8 text-white md:grid-cols-[1fr_auto] md:p-12">
         <div>
           <h2 id="dealers-title" className="title text-[clamp(1.8rem,3vw,3rem)]">

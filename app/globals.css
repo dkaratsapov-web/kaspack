@@ -225,3 +225,69 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
   .chapter-word { animation: chapterIn 700ms var(--e-settle) both; }
 }
 @keyframes chapterIn { from { opacity: 0; transform: translateY(calc(-50% + 0.12em)); } to { opacity: 1; transform: translateY(-50%); } }
+
+/* ===== v3: живые фоны и скролл (motion-background + cg-web-animate) ===== */
+/* Главы-листы: каждое цветное поле наезжает на предыдущее, скругление выпрямляется при входе */
+.chapter { position: relative; margin-top: -40px; border-radius: 40px 40px 0 0; }
+.chapter-wrap { position: relative; }
+
+/* Карточки «Под ваш груз»: grid-template-rows 0fr → 1fr */
+.custom-card { grid-template-rows: 0fr; transition: grid-template-rows 520ms var(--e-settle); }
+.custom-card[data-open='true'] { grid-template-rows: 1fr; }
+.custom-card > div > div { opacity: 0; transform: translateY(16px) scale(0.985); transition: opacity 380ms var(--e-settle), transform 520ms var(--e-settle); }
+.custom-card[data-open='true'] > div > div { opacity: 1; transform: none; }
+.custom-card-img { transform: rotate(-6deg) translateY(10px); transition: transform 700ms var(--e-settle); }
+.custom-card[data-open='true'] .custom-card-img { transform: rotate(0) translateY(0); }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* бесшовные дрейфы: сдвиг ровно на размер плитки → шва нет */
+  .chevron-drift { animation: chevronDrift 22s linear infinite; }
+  .flute-drift { animation: fluteDrift 26s linear infinite; }
+
+  @supports (animation-timeline: view()) {
+    .chapter { animation: chapterIn linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+    .bg-parallax { animation: parallaxY linear both; animation-timeline: view(); animation-range: cover; }
+    .drift-x { animation: driftX linear both; animation-timeline: view(); animation-range: cover; }
+    .depth-1 { animation: depth1 linear both; animation-timeline: scroll(root); }
+    .depth-2 { animation: depth2 linear both; animation-timeline: scroll(root); }
+    .depth-3 { animation: depth3 linear both; animation-timeline: scroll(root); }
+    .road-dash { animation: roadDash linear both; animation-timeline: view(); animation-range: cover; }
+  }
+}
+@keyframes chevronDrift { to { background-position: 120px 96px; } }
+@keyframes fluteDrift { to { background-position: 128px 0; } }
+@keyframes chapterIn { from { border-radius: 40px 40px 0 0; } to { border-radius: 0; } }
+@keyframes parallaxY { from { transform: translateY(-9%); } to { transform: translateY(9%); } }
+@keyframes driftX { from { transform: translateX(5vw); } to { transform: translateX(-5vw); } }
+@keyframes depth1 { from { transform: translateY(30vh) rotate(-8deg); } to { transform: translateY(-60vh) rotate(6deg); } }
+@keyframes depth2 { from { transform: translateY(10vh) rotate(4deg); } to { transform: translateY(-30vh) rotate(-6deg); } }
+@keyframes depth3 { from { transform: translateY(50vh) rotate(10deg); } to { transform: translateY(-90vh) rotate(-4deg); } }
+@keyframes roadDash { from { background-position-x: 0; } to { background-position-x: -900px; } }
+
+/* Единый контейнер сайта: шире (до 1760px), поля по краям растут с экраном */
+@layer components {
+  .wrap { width: 100%; max-width: 1760px; margin-inline: auto; padding-inline: clamp(20px, 3.4vw, 64px); }
+}
+
+/* Иконки УТП: у каждой своя петля и фаза */
+@media (prefers-reduced-motion: no-preference) {
+  .usp-smoke { animation: uspSmoke 3.2s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  .usp-smoke-2 { animation-delay: 1.6s; }
+  .usp-truck { animation: uspTruck 2.6s var(--ease-in-out) infinite; }
+  .usp-road { animation: uspRoad 0.9s linear infinite; }
+  .usp-hand-m { animation: uspSpin 6s linear infinite; transform-origin: 24px 25px; }
+  .usp-hand-h { animation: uspSpin 72s linear infinite; transform-origin: 24px 25px; }
+  .usp-box { animation: uspDrop 3.6s var(--e-settle) infinite; }
+}
+@keyframes uspSmoke { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -6px) scale(1.4); } }
+@keyframes uspTruck { 0%, 100% { transform: translateX(-1.5px); } 50% { transform: translateX(1.5px); } }
+@keyframes uspRoad { to { stroke-dashoffset: -11; } }
+@keyframes uspSpin { to { transform: rotate(360deg); } }
+@keyframes uspDrop { 0% { transform: translateY(-14px); opacity: 0; } 18% { opacity: 1; } 34%, 82% { transform: translateY(6px); opacity: 1; } 100% { transform: translateY(6px); opacity: 0; } }
+
+/* Поп-ап: появление через @starting-style, выход быстрее входа */
+.lead-dialog[open] { animation: dialogIn 420ms var(--e-settle) both; }
+.lead-dialog::backdrop { animation: backdropIn 300ms var(--ease-out) both; }
+@keyframes dialogIn { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lead-dialog[open], .lead-dialog::backdrop { animation: none; } }

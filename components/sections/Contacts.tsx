@@ -4,10 +4,10 @@ const mapQuery = encodeURIComponent(company.address);
 
 export function Contacts() {
   return (
-    <section id="contacts" aria-labelledby="contacts-title" className="mx-auto max-w-[1360px] px-5 pb-24 md:px-8 md:pb-32">
+    <section id="contacts" aria-labelledby="contacts-title" className="wrap pb-24 md:pb-32">
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="reveal rounded-[24px] bg-surface p-8 shadow-[0_1px_0_var(--color-line)] md:p-10 lg:col-span-5">
-          <h2 id="contacts-title" className="title">Контакты</h2>
+          <h2 id="contacts-title" className="title text-[clamp(2rem,3vw,3.2rem)]">Контакты</h2>
           <dl className="mt-8 grid gap-6">
             <div>
               <dt className="text-[14px] text-ink-mute">Телефон, WhatsApp</dt>

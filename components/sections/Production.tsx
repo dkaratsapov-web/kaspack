@@ -1,12 +1,14 @@
 import { InViewVideo } from '../InViewVideo';
+import { BoneDrift } from '../backgrounds/BoneDrift';
 
 const DIRECTIONS = ['Стрейч-плёнка', 'Переработка гранул ПНД и ПВД', 'Поддоны', 'Гофрокартон', 'Этикетки', 'Метизы'];
 
 // Производство v2: графитовое поле, реальные видео во всю ширину, направления крупным списком.
 export function Production() {
   return (
-    <section id="production" aria-labelledby="production-title" className="field-bone relative">
-      <div className="mx-auto max-w-[1600px] px-5 pb-28 pt-24 md:px-10 md:pb-36 md:pt-32">
+    <section id="production" aria-labelledby="production-title" className="chapter field-bone isolate overflow-hidden">
+      <BoneDrift />
+      <div className="wrap pb-28 pt-24 md:pb-36 md:pt-32">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <h2 id="production-title" className="title reveal lg:col-span-7">Шесть собственных производств</h2>
           <p className="lead reveal text-ink-soft lg:col-span-4 lg:col-start-9">Делаем упаковку сами, поэтому держим сроки и цену без посредников.</p>

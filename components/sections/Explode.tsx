@@ -4,7 +4,9 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { LabelRefs } from '@/components/three/ExplodeScene';
+import { FilmShader } from '../backgrounds/FilmShader';
 import { EXPLODE_OFFSET, STACK_TOP, type PalletState } from '@/components/three/LoadedPallet';
+import { LeadButton } from '@/components/LeadButton';
 
 const ExplodeScene = dynamic(() => import('@/components/three/ExplodeScene'), { ssr: false });
 
@@ -76,8 +78,9 @@ export function Explode() {
   }, []);
 
   return (
-    <section ref={section} id="explode" aria-labelledby="explode-title" className="field-graphite on-dark relative lg:h-[340vh]">
-      <div className="relative overflow-hidden lg:sticky lg:top-0 lg:h-[100svh]">
+    <section ref={section} id="explode" aria-labelledby="explode-title" className="chapter field-graphite on-dark lg:h-[340vh]">
+      <div className="relative isolate overflow-hidden lg:sticky lg:top-0 lg:h-[100svh]">
+        <FilmShader />
         {/* слово-глава за грузом */}
         <p
           aria-hidden="true"
@@ -87,7 +90,7 @@ export function Explode() {
           {CHAPTERS[chapter].word}
         </p>
 
-        <div className="relative z-10 mx-auto grid h-full max-w-[1600px] px-5 md:px-10 lg:grid-cols-12">
+        <div className="wrap relative z-10 grid h-full lg:grid-cols-12">
           <div className="flex flex-col justify-end pb-6 pt-24 lg:col-span-4 lg:pb-16">
             <h2 id="explode-title" className="title text-[clamp(2rem,3.6vw,3.6rem)] text-white">
               Каждый слой этого груза есть у нас
@@ -106,7 +109,7 @@ export function Explode() {
               ))}
             </ul>
             <div className="mt-8">
-              <a href="#calc" className="btn btn-primary" data-goal="cta_explode">Рассчитать заказ</a>
+              <LeadButton source="explode" title="Рассчитать комплект для отгрузки">Рассчитать заказ</LeadButton>
             </div>
           </div>
 

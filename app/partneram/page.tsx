@@ -16,7 +16,7 @@ const TERMS = [
 
 export default function PartnersPage() {
   return (
-    <section className="mx-auto max-w-[1360px] px-5 pb-24 pt-10 md:px-8">
+    <section className="wrap pb-24 pt-10">
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <h1 className="text-[clamp(2rem,3.6vw,3.2rem)] font-semibold leading-[1.08] tracking-[-0.03em]">Дилерам и оптовым покупателям</h1>

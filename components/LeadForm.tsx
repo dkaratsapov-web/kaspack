@@ -9,7 +9,7 @@ import { formatPhone, submitLead } from '@/lib/lead';
 type Status = 'idle' | 'sending' | 'ok' | 'error';
 
 // Короткая форма (бриф, решение 6): имя + телефон + согласие. Ошибки при уходе с поля.
-export function LeadForm({ source, layout = 'inline' }: { source: string; layout?: 'inline' | 'stack' }) {
+export function LeadForm({ source, layout = 'inline', product }: { source: string; layout?: 'inline' | 'stack'; product?: string }) {
   const id = useId();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -35,7 +35,7 @@ export function LeadForm({ source, layout = 'inline' }: { source: string; layout
     setStatus('sending');
     const fd = new FormData(e.currentTarget);
     try {
-      await submitLead({ name: name.trim(), phone: '+' + phoneDigits, consent, source, website: String(fd.get('website') ?? '') });
+      await submitLead({ name: name.trim(), phone: '+' + phoneDigits, consent, source, website: String(fd.get('website') ?? ''), products: product ? [product] : undefined });
       setStatus('ok');
     } catch {
       setStatus('error');

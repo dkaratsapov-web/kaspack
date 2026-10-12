@@ -12,9 +12,9 @@ const QA = [
 // Ответы на возражения (page-cro: objection handling). Нативный <details> — работает без JS.
 export function Faq() {
   return (
-    <section id="faq" aria-labelledby="faq-title" className="mx-auto max-w-[1360px] px-5 py-24 md:px-8 md:py-32">
+    <section id="faq" aria-labelledby="faq-title" className="wrap py-24 md:py-32">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-        <h2 id="faq-title" className="reveal title lg:col-span-4">
+        <h2 id="faq-title" className="reveal title min-w-0 text-[clamp(2.2rem,3.3vw,3.6rem)] lg:col-span-4">
           Частые вопросы
         </h2>
         <div className="divide-y divide-line border-y border-line lg:col-span-8">

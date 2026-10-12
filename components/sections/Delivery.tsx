@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
+import { FilmShader } from '../backgrounds/FilmShader';
 
 const TruckScene = dynamic(() => import('@/components/three/TruckScene'), { ssr: false });
 
@@ -38,8 +39,9 @@ export function Delivery() {
   }, []);
 
   return (
-    <section ref={section} id="delivery" aria-labelledby="delivery-title" className="field-graphite on-dark relative isolate overflow-hidden">
-      <div className="mx-auto max-w-[1600px] px-5 pt-24 md:px-10 md:pt-32">
+    <section ref={section} id="delivery" aria-labelledby="delivery-title" className="chapter field-graphite on-dark isolate overflow-hidden">
+      <FilmShader />
+      <div className="wrap pt-24 md:pt-32">
         <h2 id="delivery-title" className="giant relative z-0 text-center text-[clamp(3rem,11vw,12.5rem)] text-lime">
           <span className="block">По всей</span>
           <span className="block">России</span>
@@ -47,9 +49,11 @@ export function Delivery() {
       </div>
       {/* фура едет поверх нижней строки */}
       <div className="relative z-10 -mt-[clamp(3rem,6.5vw,7rem)] h-[clamp(240px,32vw,500px)]" aria-hidden="true">
+        {/* разметка дороги: штрихи едут при скролле */}
+        <div className="road-dash absolute inset-x-0 bottom-[16%] h-[3px] opacity-40" style={{ backgroundImage: 'linear-gradient(90deg, var(--color-lime) 0 46px, transparent 46px 90px)', backgroundSize: '90px 3px' }} />
         {webgl && mount && <TruckScene progress={progress} />}
       </div>
-      <div className="relative z-20 mx-auto max-w-[1600px] px-5 pb-24 md:px-10 md:pb-32">
+      <div className="wrap relative z-20 pb-24 md:pb-32">
         <ul className="grid gap-8 border-t border-white/15 pt-8 md:grid-cols-3">
           {POINTS.map((p) => (
             <li key={p.title} className="reveal">

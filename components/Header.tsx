@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { company, nav } from '@/lib/content';
 import { Logo } from './Logo';
+import { LeadButton } from './LeadButton';
 
 // Прилипающая шапка (бриф С12). После первого экрана становится компактнее и получает разделитель.
 export function Header() {
@@ -46,7 +47,7 @@ export function Header() {
         }`}
       >
         <div
-          className={`mx-auto flex max-w-[1360px] items-center justify-between gap-6 px-5 transition-[height] duration-200 md:px-8 ${
+          className={`wrap flex items-center justify-between gap-6 transition-[height] duration-200 ${
             scrolled ? 'h-[64px]' : 'h-[var(--header-h)]'
           }`}
         >
@@ -70,9 +71,9 @@ export function Header() {
             <a href={company.phoneHref} className="hidden text-[15px] font-semibold tabular md:block" data-goal="tel_click">
               {company.phone}
             </a>
-            <a href="#calc" className="btn btn-dark hidden !min-h-[44px] sm:inline-flex" data-goal="cta_header">
+            <LeadButton source="header" className="btn btn-dark hidden !min-h-[44px] sm:inline-flex">
               Рассчитать заказ
-            </a>
+            </LeadButton>
             <button
               ref={triggerRef}
               type="button"
@@ -108,7 +109,7 @@ export function Header() {
             </ul>
           </nav>
           <div className="mt-8 grid gap-3">
-            <a href="#calc" onClick={() => setOpen(false)} className="btn btn-primary">Рассчитать заказ</a>
+            <LeadButton source="menu" onBeforeOpen={() => setOpen(false)}>Рассчитать заказ</LeadButton>
             <a href={company.phoneHref} className="btn btn-ghost tabular">{company.phone}</a>
           </div>
         </div>

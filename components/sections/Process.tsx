@@ -8,8 +8,8 @@ const STEPS = [
 // Как проходит заказ: реальная последовательность, поэтому номера уместны.
 export function Process() {
   return (
-    <section id="process" aria-labelledby="process-title" className="mx-auto max-w-[1360px] px-5 py-24 md:px-8 md:py-32">
-      <h2 id="process-title" className="reveal title">
+    <section id="process" aria-labelledby="process-title" className="wrap py-24 md:py-32">
+      <h2 id="process-title" className="reveal title text-[clamp(2.2rem,4vw,4.4rem)]">
         Как проходит заказ
       </h2>
       <ol className="mt-12 grid gap-8 md:grid-cols-4 md:gap-6">

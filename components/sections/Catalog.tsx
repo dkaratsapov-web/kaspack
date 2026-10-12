@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { categories, families } from '@/lib/content';
 import { asset } from '@/lib/env';
+import { BoneDrift } from '../backgrounds/BoneDrift';
 
 // Каталог v2 — «конвейер» (premium-web-design: section system 6, горизонтальная глава от вертикального скролла).
 // Десктоп: секция залипает, лента с 17 товарами едет влево. Телефон: нативная горизонтальная прокрутка со snap.
@@ -49,11 +50,12 @@ export function Catalog() {
       ref={section}
       id="catalog"
       aria-labelledby="catalog-title"
-      className="field-bone relative"
+      className="chapter field-bone"
       style={height ? { height } : undefined}
     >
-      <div className="overflow-hidden lg:sticky lg:top-0 lg:flex lg:h-[100svh] lg:flex-col lg:justify-center">
-        <div className="mx-auto flex w-full max-w-[1600px] items-end justify-between gap-8 px-5 pt-24 md:px-10 lg:pt-20">
+      <div className="relative isolate overflow-hidden lg:sticky lg:top-0 lg:flex lg:h-[100svh] lg:flex-col lg:justify-center">
+        <BoneDrift />
+        <div className="wrap flex w-full items-end justify-between gap-8 pt-24 lg:pt-20">
           <h2 id="catalog-title" className="title max-w-[14ch]">17 видов упаковки на одной ленте</h2>
           <p className="hidden shrink-0 font-display text-[clamp(2rem,3.4vw,3.4rem)] font-bold tabular tracking-[-0.04em] lg:block" aria-hidden="true">
             {String(index).padStart(2, '0')}<span className="text-ink/25"> / {categories.length}</span>

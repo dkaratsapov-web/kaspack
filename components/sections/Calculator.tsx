@@ -45,7 +45,7 @@ export function Calculator() {
   }
 
   return (
-    <section id="calc" aria-labelledby="calc-title" className="mx-auto max-w-[1360px] px-5 py-24 md:px-8 md:py-32">
+    <section id="calc" aria-labelledby="calc-title" className="wrap py-24 md:py-32">
       <div className="grid gap-10 rounded-[28px] bg-surface p-6 shadow-[0_1px_0_var(--color-line),0_30px_60px_-40px_rgb(24_27_33/0.35)] md:p-10 lg:grid-cols-12 lg:gap-12 lg:p-14">
         <div className="lg:col-span-4">
           <h2 id="calc-title" className="title text-[clamp(2.2rem,3.4vw,3.6rem)]">

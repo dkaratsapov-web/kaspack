@@ -31,7 +31,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <section className="mx-auto max-w-[1360px] px-5 pb-16 pt-8 md:px-8 md:pb-24">
+      <section className="wrap pb-16 pt-8 md:pb-24">
         <nav aria-label="Хлебные крошки" className="text-[14px] text-ink-mute">
           <ol className="flex flex-wrap gap-2">
             <li><Link href="/" className="hover:text-ink">Главная</Link> /</li>
@@ -54,7 +54,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
       {d && d.specs.length > 0 && (
         <section aria-labelledby="specs-title" className="bg-surface">
-          <div className="mx-auto grid max-w-[1360px] gap-10 px-5 py-20 md:px-8 lg:grid-cols-12">
+          <div className="wrap grid gap-10 py-20 lg:grid-cols-12">
             <h2 id="specs-title" className="text-[clamp(1.5rem,2.4vw,2rem)] font-semibold tracking-[-0.02em] lg:col-span-4">Характеристики</h2>
             <dl className="divide-y divide-line border-y border-line lg:col-span-8">
               {d.specs.map(([k, v]) => (
@@ -69,7 +69,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       )}
 
       {related.length > 0 && (
-        <section aria-labelledby="rel-title" className="mx-auto max-w-[1360px] px-5 py-20 md:px-8">
+        <section aria-labelledby="rel-title" className="wrap py-20">
           <h2 id="rel-title" className="text-[clamp(1.5rem,2.4vw,2rem)] font-semibold tracking-[-0.02em]">С этим берут</h2>
           <ul className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
             {related.map((r) => (
