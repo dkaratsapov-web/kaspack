@@ -81,11 +81,11 @@ export function Explode() {
     <section ref={section} id="explode" aria-labelledby="explode-title" className="chapter field-graphite on-dark lg:h-[340vh]">
       <div className="relative isolate overflow-hidden lg:sticky lg:top-0 lg:h-[100svh]">
         <FilmShader />
-        {/* слово-глава за грузом */}
+        {/* слово-глава: верхняя полоса над грузом, справа от колонки с текстом — заголовок всегда читается целиком */}
         <p
           aria-hidden="true"
           key={chapter}
-          className="giant chapter-word pointer-events-none absolute inset-x-0 top-1/2 z-0 -translate-y-1/2 text-center text-[clamp(4rem,17vw,19rem)] text-white/[0.07] lg:text-[#beea1f]/[0.14]"
+          className="giant chapter-word pointer-events-none absolute inset-x-0 bottom-[3%] z-0 whitespace-nowrap text-center text-[clamp(3.5rem,17vw,8rem)] text-white/[0.07] lg:bottom-auto lg:left-[36%] lg:right-[clamp(20px,3.4vw,64px)] lg:top-[calc(var(--header-h)+3vh)] lg:text-right lg:text-[min(11vw,24vh,15rem)] lg:text-[#beea1f]/[0.16]"
         >
           {CHAPTERS[chapter].word}
         </p>

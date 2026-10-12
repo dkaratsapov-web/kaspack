@@ -222,9 +222,9 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 }
 @keyframes giantRise { from { transform: translateY(0.35em); opacity: 0; clip-path: inset(0 0 100% 0); } to { transform: none; opacity: 1; clip-path: inset(0 0 -10% 0); } }
 @media (prefers-reduced-motion: no-preference) {
-  .chapter-word { animation: chapterIn 700ms var(--e-settle) both; }
+  .chapter-word { animation: wordIn 700ms var(--e-settle) both; }
 }
-@keyframes chapterIn { from { opacity: 0; transform: translateY(calc(-50% + 0.12em)); } to { opacity: 1; transform: translateY(-50%); } }
+@keyframes wordIn { from { opacity: 0; transform: translateY(0.12em); } to { opacity: 1; transform: none; } }
 
 /* ===== v3: живые фоны и скролл (motion-background + cg-web-animate) ===== */
 /* Главы-листы: каждое цветное поле наезжает на предыдущее, скругление выпрямляется при входе */
