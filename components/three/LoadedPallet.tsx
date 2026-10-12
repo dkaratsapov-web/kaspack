@@ -23,7 +23,7 @@ export const EXPLODE_OFFSET: Record<string, number> = {
   pallet: 0, tier1: 0.34, tier2: 0.68, tier3: 1.02, strap: 1.42, film: 1.8,
 };
 
-function useMaterials() {
+function useMaterials(filmOpacity: number) {
   return useMemo(() => {
     const kraft = kraftTextures();
     const kraftMap = kraft.map.clone(); kraftMap.repeat.set(1.2, 0.6); kraftMap.needsUpdate = true;
@@ -39,12 +39,12 @@ function useMaterials() {
       strap: new THREE.MeshPhysicalMaterial({ color: '#beea1f', roughness: 0.42, clearcoat: 0.4, clearcoatRoughness: 0.35 }),
       corner: new THREE.MeshStandardMaterial({ color: '#2b2f36', roughness: 0.62 }),
       film: new THREE.MeshPhysicalMaterial({
-        color: '#e8f0ff', roughness: 0.12, metalness: 0, transparent: true, opacity: 0.26,
+        color: '#e8f0ff', roughness: 0.12, metalness: 0, transparent: true, opacity: filmOpacity,
         clearcoat: 1, clearcoatRoughness: 0.08, side: THREE.DoubleSide, depthWrite: false, envMapIntensity: 1.6,
       }),
       stamp: new THREE.MeshStandardMaterial({ map: stampTexture(), transparent: true, roughness: 0.9, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }),
     };
-  }, []);
+  }, [filmOpacity]);
 }
 
 type M = ReturnType<typeof useMaterials>;
@@ -196,8 +196,9 @@ function useFilmGeometry() {
 const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 const smooth = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
-export function LoadedPallet({ state }: { state: React.RefObject<PalletState> }) {
-  const m = useMaterials();
+/** filmOpacity: на тёмном поле «Груза в разборе» плёнка прозрачнее — иначе молочная пелена и блики «двоят» коробки. */
+export function LoadedPallet({ state, filmOpacity = 0.26 }: { state: React.RefObject<PalletState>; filmOpacity?: number }) {
+  const m = useMaterials(filmOpacity);
   const { geo, total } = useFilmGeometry();
   const layers = useRef<Record<string, THREE.Group | null>>({});
   const lastWrap = useRef(-1);

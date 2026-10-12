@@ -27,8 +27,11 @@ const ITEMS = [
   },
 ] as const;
 
-export function Messengers({ size = 'sm', className = '' }: { size?: 'sm' | 'lg'; className?: string }) {
+export function Messengers({ size = 'sm', tone = 'light', className = '' }: { size?: 'sm' | 'lg'; tone?: 'light' | 'dark'; className?: string }) {
   const box = size === 'lg' ? 'h-14 w-14' : 'h-10 w-10';
+  // light — на светлом поле, dark — в графитовой капсуле шапки и в меню
+  const base = tone === 'dark' ? 'bg-white/[0.07] text-bone' : 'bg-ink/[0.06] text-ink';
+  const off = tone === 'dark' ? 'bg-white/[0.04] text-bone/35' : 'bg-ink/[0.06] text-ink/45';
   return (
     <ul className={`flex items-center gap-1.5 ${className}`} aria-label="Написать в мессенджер">
       {ITEMS.map((m) => (
@@ -37,14 +40,14 @@ export function Messengers({ size = 'sm', className = '' }: { size?: 'sm' | 'lg'
             <a
               href={m.href} target="_blank" rel="noopener noreferrer" data-goal={m.goal}
               aria-label={`Написать в ${m.label}`} title={m.label}
-              className={`grid ${box} place-items-center rounded-full bg-ink/[0.06] text-ink transition-colors duration-200 ${m.hover}`}
+              className={`grid ${box} place-items-center rounded-full transition-colors duration-200 ${base} ${m.hover}`}
             >
               {m.icon}
             </a>
           ) : (
             <span
               role="link" aria-disabled="true" aria-label={`${m.label}: ссылка скоро появится`} title={`${m.label}: ссылка скоро появится`}
-              className={`grid ${box} cursor-default place-items-center rounded-full bg-ink/[0.06] text-ink/45`}
+              className={`grid ${box} cursor-default place-items-center rounded-full ${off}`}
             >
               {m.icon}
             </span>

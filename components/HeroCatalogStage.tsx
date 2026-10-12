@@ -30,6 +30,7 @@ const DAMP = 9;
 export function HeroCatalogStage({ children }: { children: React.ReactNode }) {
   const stage = useRef<HTMLDivElement>(null);
   const anchor = useRef<HTMLDivElement>(null);
+  const zone = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = stage.current;
@@ -55,6 +56,8 @@ export function HeroCatalogStage({ children }: { children: React.ReactNode }) {
       el.style.height = `${innerHeight + A + C}px`;
       top = el.getBoundingClientRect().top + scrollY;
       if (anchor.current) anchor.current.style.top = `${A + 120}px`;
+      // зона «каталог на экране» для подсветки пункта в шапке: с момента, когда заголовок подъехал
+      if (zone.current) { zone.current.style.top = `${A * 0.8}px`; zone.current.style.bottom = '0'; zone.current.style.display = 'block'; }
     };
 
     const s = { q: 0, c: 0, first: true };
@@ -117,6 +120,7 @@ export function HeroCatalogStage({ children }: { children: React.ReactNode }) {
   return (
     <div ref={stage} className="stage relative -mt-[var(--header-h)]">
       <div ref={anchor} aria-hidden="true" className="pointer-events-none absolute left-0 h-px w-px" />
+      <div ref={zone} data-catalog-zone aria-hidden="true" className="pointer-events-none absolute left-0 hidden w-px" />
       <div className="stage-view">
         {children}
         <div data-handoff-layer aria-hidden="true" className="handoff-layer" />

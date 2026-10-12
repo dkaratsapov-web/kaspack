@@ -60,7 +60,7 @@ function Rig({ state, labels, guides }: { state: React.RefObject<PalletState>; l
 
   return (
     <group ref={group}>
-      <LoadedPallet state={state} />
+      <LoadedPallet state={state} filmOpacity={0.1} />
     </group>
   );
 }

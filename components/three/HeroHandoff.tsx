@@ -6,7 +6,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Studio } from './Studio';
 import { ProductModel } from './products';
-import { STACK_TOP } from './LoadedPallet';
 import { StageDriver } from './StageDriver';
 import { HANDOFF_COUNT, heroProgress } from '@/lib/heroProgress';
 import { categories } from '@/lib/content';
@@ -36,6 +35,8 @@ const span = (x: number, a: number, b: number) => clamp01((x - a) / (b - a));
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const riseAt = (i: number) => 0.12 + i * 0.035;
+/** длина подъёма из короба; пока товар внутри, его рисует сцена груза (HeroRisers) — стенки и клапаны его честно закрывают */
+const RISE = 0.1;
 const landSpan = (i: number): [number, number] => [0.5 + i * 0.035, 0.74 + i * 0.035];
 const ACTIVE_FROM = 0.08, ACTIVE_TO = 0.999;
 
@@ -49,8 +50,44 @@ function setWait(cards: Els['cards'], i: number, wait: boolean) {
   else if (!wait && 'wait' in li.dataset) delete li.dataset.wait;
 }
 
+/** Подъём из короба внутри сцены груза: та же поза, что у слоя товаров в момент подхвата. */
+export function HeroRisers() {
+  const items = useRef<(THREE.Group | null)[]>([]);
+  const warm = useRef(0);
+  const e = useMemo(() => new THREE.Euler(), []);
+
+  useFrame((s) => {
+    const q = heroProgress.q, t = s.clock.elapsedTime;
+    // прогрев: шейдеры товаров компилируются сразу, а не в момент подъёма
+    const warming = warm.current < 3;
+    if (warming) warm.current++;
+    for (let i = 0; i < N; i++) {
+      const g = items.current[i];
+      if (!g) continue;
+      const rise = span(q, riseAt(i), riseAt(i) + RISE);
+      g.visible = warming || (rise > 0 && rise < 1);
+      if (!g.visible) continue;
+      const c = heroProgress.cartons[i % 4];
+      g.position.set(c[0], c[1] - 0.2 + 0.45 * easeOut(rise), c[2]);
+      g.scale.setScalar(warming ? 1e-4 : 0.24);
+      e.set(0.18, i * 0.9 + q * 3 + t * 0.35, 0.06);
+      g.quaternion.setFromEuler(e);
+    }
+  });
+
+  return (
+    <>
+      {SLUGS.map((slug, i) => (
+        <group key={slug} ref={(o) => { items.current[i] = o; }} visible={false}>
+          <group position={[0, -0.32, 0]}><ProductModel slug={slug} /></group>
+        </group>
+      ))}
+    </>
+  );
+}
+
 function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
-  const { camera, gl, scene, size } = useThree();
+  const { camera, scene, size } = useThree();
   const items = useRef<(THREE.Group | null)[]>([]);
   const studio = useRef<THREE.Group>(null);
   const landedAt = useRef<number[]>(Array(N).fill(-1));
@@ -58,7 +95,7 @@ function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
   const v = useMemo(() => ({
     a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3(),
     up: new THREE.Vector3(0, 1, 0), m: new THREE.Matrix4(), q: new THREE.Quaternion(), qh: new THREE.Quaternion(), e: new THREE.Euler(),
-    clip: [new THREE.Plane(new THREE.Vector3(0, 1, 0), -(STACK_TOP + 0.02))], none: [] as THREE.Plane[],
+    one: new THREE.Quaternion(),
   }), []);
 
   // замеры относительно закреплённого экрана (canvas занимает его целиком); лента — без текущего сдвига
@@ -106,8 +143,6 @@ function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
       out.set((px / W) * 2 - 1, -(py / H) * 2 + 1, 0.5).unproject(cam).sub(cam.position).normalize().multiplyScalar(dist).add(cam.position);
 
     const q = sh.q;
-    // пока товары выезжают, всё ниже кромки коробов срезано — они «вырастают» из полости
-    gl.clippingPlanes = q > riseAt(N - 1) + 0.12 ? v.none : v.clip;
 
     const D = sh.cam.dist * 0.86;
     const xLast = f.left + f.width * 0.55;
@@ -119,15 +154,16 @@ function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
       const g = items.current[i];
       if (!g) continue;
       const s0 = riseAt(i);
-      const rise = span(q, s0, s0 + 0.1);
-      const toRow = span(q, s0 + 0.05, s0 + 0.17);
+      const rise = span(q, s0, s0 + RISE);
+      const toRow = span(q, s0 + RISE, s0 + RISE + 0.12);
       const [la, lb] = landSpan(i);
       const land = span(q, la, lb);
       if (land < 1) landedAt.current[i] = -1;
       else if (landedAt.current[i] < 0) landedAt.current[i] = t;
       // картинка карточки проявляется в момент посадки, модель держится под ней ещё 0,55 с
       setWait(els.cards, i, land < 1);
-      const show = rise > 0 && !(land >= 1 && t - landedAt.current[i] > 0.55);
+      // этот слой подхватывает товар, когда тот целиком вышел из короба (до этого его рисует сцена груза)
+      const show = rise >= 1 && !(land >= 1 && t - landedAt.current[i] > 0.55);
       g.visible = show;
       if (!show) continue;
 
@@ -158,10 +194,12 @@ function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
       v.qh.setFromEuler(v.e);
       g.quaternion.slerpQuaternions(v.qh, v.q, l);
 
-      // свет поворачивается вместе с ракурсом превью — при подмене на картинку блики совпадают
+      // свет поворачивается к ракурсу превью по мере посадки: при выходе из короба — как в сцене груза,
+      // при подмене на картинку — как на рендере карточки
       if (!lit) {
-        scene.environmentRotation.setFromQuaternion(v.q);
-        studio.current?.quaternion.copy(v.q);
+        v.one.identity().slerp(v.q, l);
+        scene.environmentRotation.setFromQuaternion(v.one);
+        studio.current?.quaternion.copy(v.one);
         lit = true;
       }
     }

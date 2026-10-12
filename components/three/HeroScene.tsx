@@ -6,7 +6,7 @@ import { ContactShadows } from '@react-three/drei';
 import { Studio } from './Studio';
 import * as THREE from 'three';
 import { LoadedPallet, STACK_TOP, TOP_CARTONS, type PalletState } from './LoadedPallet';
-import HeroHandoff from './HeroHandoff';
+import HeroHandoff, { HeroRisers } from './HeroHandoff';
 import { StageDriver } from './StageDriver';
 import { heroProgress } from '@/lib/heroProgress';
 
@@ -147,6 +147,7 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
           <Studio />
           <Rig state={state} reduced={reduced} />
           {pinned && <StageDriver when={heroShown} />}
+          {products && <HeroRisers />}
           <ContactShadows position={[0, 0, 0]} opacity={0.55} scale={4.5} blur={2.4} far={1.6} resolution={512} color="#2b3a00" />
         </Suspense>
       </Canvas>
