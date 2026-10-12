@@ -132,7 +132,7 @@ export function Header() {
     <>
       <header className="pointer-events-none sticky top-0 z-[var(--z-header)] h-[var(--header-h)]">
         <div
-          className={`site-header wrap pt-3 transition-transform duration-[220ms] [transition-timing-function:var(--e-settle)] ${shown ? 'translate-y-0' : '-translate-y-[130%]'}`}
+          className={`site-header wrap pt-3 transition-transform duration-[220ms] [transition-timing-function:var(--e-settle)] ${shown ? 'translate-y-0' : '-translate-y-[calc(100%+48px)]'}`}
           onFocusCapture={() => { focusInside.current = true; setVisible(true); }}
           onBlurCapture={() => { focusInside.current = false; }}
         >

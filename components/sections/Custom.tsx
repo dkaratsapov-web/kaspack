@@ -136,7 +136,7 @@ export function Custom() {
                       onClick={() => go(i)}
                       className="flex w-full items-center justify-between gap-6 py-[1.9vh] text-left"
                     >
-                      <span className={`font-display text-[clamp(1.25rem,1.9vw,2.1rem)] font-bold leading-[1.08] tracking-[-0.035em] transition-[color,translate] duration-500 [transition-timing-function:var(--e-settle)] ${on ? 'translate-x-3 text-kraft-ink' : 'text-kraft-ink/40 hover:text-kraft-ink/70'}`}>
+                      <span className={`font-display text-[clamp(1.25rem,1.9vw,2.1rem)] font-bold leading-[1.08] tracking-[-0.035em] transition-[color,translate] duration-500 [transition-timing-function:var(--e-settle)] ${on ? 'translate-x-3 text-kraft-ink' : 'text-kraft-ink/55 hover:text-kraft-ink/80'}`}>
                         {o.title}
                       </span>
                       <svg aria-hidden="true" viewBox="0 0 190 88" className={`h-3 w-5 shrink-0 -rotate-90 transition-opacity duration-300 ${on ? 'opacity-100' : 'opacity-0'}`}><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>

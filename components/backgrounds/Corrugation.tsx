@@ -1,16 +1,23 @@
-// Крафтовое поле: гофрослой (волны между лайнерами) и волокна картона; параллакс от скролла.
-const FLUTE = encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'><path d='M0 20 C 8 4, 24 4, 32 20 S 56 36, 64 20' fill='none' stroke='#2a1f14' stroke-opacity='.10' stroke-width='2'/><path d='M0 2 H64 M0 38 H64' stroke='#2a1f14' stroke-opacity='.06' stroke-width='2'/></svg>`,
-);
+import { asset } from '@/lib/env';
 
+// Крафтовое поле «Под ваш груз»: фото среза многослойного гофрокартона (от заказчика) с лёгким параллаксом.
+// Слева крафтовая подложка — список разделов читается; справа фото видно в полную силу.
 export function Corrugation() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <div
-        className="bg-parallax flute-drift absolute -inset-y-[25%] inset-x-0"
-        style={{ backgroundImage: `url("data:image/svg+xml,${FLUTE}")`, backgroundSize: '64px 40px' }}
+      <img
+        src={asset('/textures/corrugated-layers.webp')}
+        srcSet={`${asset('/textures/corrugated-layers-960.webp')} 960w, ${asset('/textures/corrugated-layers.webp')} 1672w`}
+        sizes="100vw"
+        alt=""
+        width={1672}
+        height={941}
+        loading="lazy"
+        decoding="async"
+        className="bg-parallax absolute inset-x-0 -inset-y-[10%] h-[120%] w-full object-cover"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,var(--color-kraft)_0%,transparent_22%,transparent_78%,var(--color-kraft)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(198_156_109/0.86)_0%,rgb(198_156_109/0.62)_38%,rgb(198_156_109/0.12)_75%,rgb(198_156_109/0)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(198_156_109/0.35)_0%,transparent_30%,transparent_80%,rgb(42_31_20/0.18)_100%)]" />
     </div>
   );
 }

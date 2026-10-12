@@ -144,7 +144,6 @@ function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
 
     const q = sh.q;
 
-    const D = sh.cam.dist * 0.86;
     const xLast = f.left + f.width * 0.55;
     const gap = Math.min((b.slots[1].left - b.slots[0].left) * 0.5, (xLast - 90) / (N - 1));
     const t = s.clock.elapsedTime;
@@ -166,6 +165,10 @@ function Flights({ els, warm }: { els: Els; warm: React.RefObject<number> }) {
       const show = rise >= 1 && !(land >= 1 && t - landedAt.current[i] > 0.55);
       g.visible = show;
       if (!show) continue;
+
+      // у каждого товара свой слой глубины (шаг ~0,35 м): в полёте они проходят друг перед другом, а не насквозь.
+      // Положение на экране и итоговый размер от глубины не зависят — масштаб считается через неё же
+      const D = sh.cam.dist * (0.72 + 0.06 * i);
 
       // карточка: центр кадра превью = точка модели (0; 0,32; 0), поза — как у камеры превью
       const r = b.slots[i];
