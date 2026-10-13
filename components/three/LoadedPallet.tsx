@@ -212,10 +212,16 @@ export function LoadedPallet({ state, filmOpacity = 0.26 }: { state: React.RefOb
       if (!g) continue;
       g.position.y = EXPLODE_OFFSET[k] * e;
     }
-    if (layers.current.film) layers.current.film.rotation.y = -0.22 * e;
+    // при разборе плёнка и лента не поворачиваются (иначе углы уходят внутрь коробов), а чуть расходятся наружу:
+    // обнимают груз снаружи и не пересекают ни один короб
+    if (layers.current.film) layers.current.film.scale.set(1 + 0.1 * e, 1, 1 + 0.16 * e);
     if (layers.current.strap) {
       const st = smooth(Math.min(1, Math.max(0, s.strip ?? 0)));
-      layers.current.strap.rotation.y = 0.1 * e + 0.35 * st;
+      layers.current.strap.rotation.y = 0.35 * st;
+      // при разборе лента сжимается в короткое кольцо (верх на месте) и висит целиком над верхним ярусом
+      const sy = 1 - 0.7 * e;
+      layers.current.strap.scale.set(1 + 0.12 * e, sy, 1 + 0.22 * e);
+      layers.current.strap.position.y += STACK_TOP * (1 - sy);
       layers.current.strap.position.y += 2.4 * st;
       layers.current.strap.visible = st < 0.999;
     }
