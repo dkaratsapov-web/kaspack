@@ -335,7 +335,9 @@ export default function HeroHandoff() {
   if (!els || !target) return null;
   return createPortal(
     <div ref={container} className="absolute inset-0" style={{ visibility: 'hidden' }}>
+      {/* холст только рисует полёт: клики проходят к карточкам каталога под ним */}
       <Canvas
+        style={{ pointerEvents: 'none' }}
         dpr={[1, 1.25]}
         frameloop="never"
         camera={{ fov: 26, near: 0.1, far: 60 }}

@@ -99,15 +99,19 @@ export function Header() {
     if (!tape || !list) return;
     const place = () => {
       // позиция пункта — относительно списка (у ссылки offsetParent — её li)
-      const item = active ? list.querySelector<HTMLElement>(`a[href="${active}"]`)?.closest('li') : null;
+      // ищем по data-nav, а не по href: на GitHub Pages у ссылок есть префикс /kaspack
+      const item = active ? list.querySelector<HTMLElement>(`li[data-nav="${active}"]`) : null;
       if (!item) { tape.style.opacity = '0'; return; }
       tape.style.opacity = '1';
       tape.style.transform = `translateX(${item.offsetLeft}px)`;
       tape.style.width = `${item.offsetWidth}px`;
     };
     place();
-    addEventListener('resize', place);
-    return () => removeEventListener('resize', place);
+    // пересчёт и после загрузки шрифтов: ширина пунктов меняется, лента иначе уезжает мимо пункта
+    const ro = new ResizeObserver(place);
+    ro.observe(list);
+    document.fonts?.ready.then(place);
+    return () => ro.disconnect();
   }, [active]);
 
   // мобильное меню: модальный слой — фон inert, фокус внутри и по кругу, Escape, возврат фокуса, скролл заблокирован
@@ -182,6 +186,7 @@ export function Header() {
                   return (
                     <li
                       key={item.href}
+                      data-nav={item.href}
                       ref={isCat ? catZone : undefined}
                       className={`relative flex items-center ${isCat ? "after:absolute after:inset-x-0 after:top-full after:h-3 after:content-['']" : ''}`}
                       onPointerEnter={isCat ? (e) => { if (e.pointerType === 'mouse') hoverCat(true); } : undefined}
