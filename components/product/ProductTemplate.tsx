@@ -21,6 +21,15 @@ import { ProductViewer } from './ProductViewer';
  *   7. вопросы (FAQPage) и финальная заявка
  * Цветовые поля чередуются, как на главной: светлое → графит → светлое → лайм → светлое → графит.
  */
+/** Размер H1 по самому длинному слову: «ТЕРМОЧЕКОВАЯ» и «ПУЗЫРЧАТАЯ» должны влезать в строку на телефоне. */
+function h1Size(h1: string) {
+  const longest = Math.max(...h1.split(/[\s-]+/).map((w) => w.length));
+  if (longest >= 11) return 'text-[clamp(2.05rem,6vw,6.6rem)]';
+  if (longest >= 10) return 'text-[clamp(2.35rem,6.8vw,7.4rem)]';
+  if (longest >= 9) return 'text-[clamp(2.6rem,7vw,7.8rem)]';
+  return 'text-[clamp(2.9rem,7.4vw,8.2rem)]';
+}
+
 export function ProductTemplate({ page, category }: { page: ProductPage; category: Category }) {
   const related = page.related.map((s) => categories.find((c) => c.slug === s)).filter(Boolean) as Category[];
 
@@ -39,7 +48,7 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
             </nav>
             <p className="mt-8 text-[14px] font-semibold text-ink-soft">{page.hero.eyebrow ?? `${families[category.family]} · своё производство в Твери`}</p>
             <h1 id="product-title" className="mt-3">
-              <span className="giant block text-[clamp(2.9rem,7.4vw,8.2rem)] leading-[1.02]">{page.hero.h1}</span>
+              <span className={`giant block leading-[1.02] ${h1Size(page.hero.h1)}`}>{page.hero.h1}</span>
               <span className="title mt-2 block text-[clamp(1.6rem,3vw,3rem)] text-ink-soft">{page.hero.kicker}</span>
             </h1>
             <p className="lead mt-6 max-w-[52ch] text-ink-soft">{page.hero.lead}</p>
