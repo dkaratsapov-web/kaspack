@@ -251,7 +251,7 @@ export function LoadedPallet({ state, filmOpacity = 0.26 }: { state: React.RefOb
       <group ref={ref('strap')}><Strapping m={m} /><group name="anchor-strap" position={[0.32, STACK_TOP, D / 2]} /></group>
       <group ref={ref('film')}>
         <mesh geometry={geo} material={m.film} renderOrder={2} />
-        <group name="anchor-film" position={[-W / 2 - 0.02, PH + BH * 1.6, D / 2 + 0.02]} />
+        <group name="anchor-film" position={[W / 2 + 0.02, STACK_TOP + 0.16, D / 2 + 0.02]} />
       </group>
     </group>
   );

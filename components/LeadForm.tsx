@@ -9,7 +9,7 @@ import { formatPhone, submitLead } from '@/lib/lead';
 type Status = 'idle' | 'sending' | 'ok' | 'error';
 
 // Короткая форма (бриф, решение 6): имя + телефон + согласие. Ошибки при уходе с поля.
-export function LeadForm({ source, layout = 'inline', product }: { source: string; layout?: 'inline' | 'stack'; product?: string }) {
+export function LeadForm({ source, layout = 'inline', product }: { source: string; layout?: 'inline' | 'stack' | 'pair'; product?: string }) {
   const id = useId();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -54,14 +54,15 @@ export function LeadForm({ source, layout = 'inline', product }: { source: strin
     );
   }
 
-  const inline = layout === 'inline';
+  // inline — в строку (широкие места), stack — столбиком (поп-ап), pair — два поля в ряд и кнопка под ними (узкие колонки)
+  const grid = layout === 'inline' ? 'grid gap-3 sm:grid-cols-[1fr_1.1fr_auto]' : layout === 'pair' ? 'grid gap-3 sm:grid-cols-2 [&>button]:sm:col-span-2' : 'grid gap-3';
   return (
     <form onSubmit={onSubmit} noValidate aria-describedby={`${id}-sla`}>
       {/* honeypot для ботов */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label>Сайт <input name="website" aria-label="Не заполняйте это поле" tabIndex={-1} autoComplete="off" /></label>
       </div>
-      <div className={inline ? 'grid gap-3 sm:grid-cols-[1fr_1.1fr_auto]' : 'grid gap-3'}>
+      <div className={grid}>
         <div>
           <label htmlFor={`${id}-name`} className="sr-only">Имя</label>
           <input
@@ -86,7 +87,7 @@ export function LeadForm({ source, layout = 'inline', product }: { source: strin
           <svg className="chev h-3 w-4" viewBox="0 0 190 88" aria-hidden="true"><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
         </button>
       </div>
-      <div className="mt-3 flex flex-col gap-2 text-[13px] leading-snug text-ink-soft sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+      <div className={`mt-3 flex flex-col gap-2 text-[13px] leading-snug text-ink-soft ${layout === 'pair' ? '' : 'sm:flex-row sm:items-start sm:justify-between sm:gap-6'}`}>
         <label className="flex cursor-pointer items-start gap-2.5">
           <input
             type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}

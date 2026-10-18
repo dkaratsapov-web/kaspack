@@ -6,12 +6,12 @@ import { useEffect, useRef, useState } from 'react';
 import type { LabelRefs } from '@/components/three/ExplodeScene';
 import { Blueprint } from '../backgrounds/Blueprint';
 import { EXPLODE_OFFSET, STACK_TOP, type PalletState } from '@/components/three/LoadedPallet';
-import { LeadButton } from '@/components/LeadButton';
+import { LeadForm } from '@/components/LeadForm';
 
 const ExplodeScene = dynamic(() => import('@/components/three/ExplodeScene'), { ssr: false });
 
 const LAYERS: { key: keyof LabelRefs; title: string; spec: string; href: string; side: 'left' | 'right' }[] = [
-  { key: 'film', title: 'Стрейч-плёнка', spec: '17–23 мкм, ручная и машинная', href: '/strejch-plenka', side: 'left' },
+  { key: 'film', title: 'Стрейч-плёнка', spec: '17–23 мкм, ручная и машинная', href: '/strejch-plenka', side: 'right' },
   { key: 'strap', title: 'Стреппинг-лента и уголки', spec: 'ПП и ПЭТ, разрыв до 1 т', href: '/strepping-lenta-i-peht-lenta-zashchitnye-ugolki', side: 'right' },
   { key: 'tier', title: 'Гофрокороба и скотч', spec: 'Т-21…Т-24, логотип на скотче', href: '/gofrotara', side: 'right' },
   { key: 'pallet', title: 'Поддон с клеймом IPPC', spec: 'Термообработка для экспорта', href: '/poddony-borta-brus', side: 'right' },
@@ -115,8 +115,10 @@ export function Explode() {
                 </li>
               ))}
             </ul>
-            <div className="mt-8">
-              <LeadButton source="explode" title="Рассчитать комплект для отгрузки">Рассчитать заказ</LeadButton>
+            {/* открытая форма: расчёт комплекта прямо здесь, без поп-апа */}
+            <div className="mt-7 max-w-[34rem] rounded-[20px] bg-white/95 p-3 text-ink shadow-[0_30px_60px_-30px_rgb(0_0_0/0.6)] md:p-4">
+              <p className="mb-3 px-1 font-display text-[17px] font-bold tracking-[-0.02em]">Рассчитаем комплект для вашей отгрузки</p>
+              <LeadForm source="explode" layout="pair" product="Комплект для отгрузки" />
             </div>
           </div>
 
@@ -127,7 +129,7 @@ export function Explode() {
                 <div key={l.key} ref={(el) => { labels.current[l.key] = el; }} data-on="false" className="explode-label absolute left-0 top-0">
                   <span className="absolute -left-[5px] -top-[5px] h-[10px] w-[10px] rounded-full bg-lime shadow-[0_0_0_4px_rgb(190_234_31/0.25)]" />
                   <span className={`absolute top-0 h-px w-14 bg-lime/70 ${l.side === 'left' ? 'right-0' : 'left-0'}`} />
-                  <span className={`absolute top-0 w-[220px] -translate-y-1/2 rounded-[14px] border border-white/10 bg-graphite-2/90 px-4 py-3 backdrop-blur ${l.side === 'left' ? 'right-16' : 'left-16'}`}>
+                  <span className={`absolute top-0 w-[220px] ${l.key === 'film' ? '-translate-y-[calc(100%-6px)]' : '-translate-y-1/2'} rounded-[14px] border border-white/10 bg-graphite-2/90 px-4 py-3 backdrop-blur ${l.side === 'left' ? 'right-16' : 'left-16'}`}>
                     <span className="block text-[15px] font-semibold text-white">{l.title}</span>
                     <span className="mt-0.5 block text-[13px] leading-snug text-graphite-soft">{l.spec}</span>
                   </span>
