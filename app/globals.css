@@ -303,6 +303,8 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
   .stage[data-staged] [data-stage-title] { will-change: transform, opacity; }
   /* карточка ждёт, пока её товар прилетит из груза (HeroHandoff) */
   [data-wait] .spin-still { opacity: 0; transition-duration: 0s; }
+  /* подмена 3D → картинка карточки — в одном кадре, без наплыва (иначе любое расхождение видно как двоение) */
+  .stage[data-staged] .spin-still { transition-property: transform; }
 }
 .custom-panel { opacity: 0; transform: translateY(28px) scale(0.98); transition: opacity 360ms var(--e-settle), transform 600ms var(--e-settle); }
 .custom-panel[data-on='true'] { opacity: 1; transform: none; transition-delay: 80ms; }

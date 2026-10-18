@@ -133,7 +133,7 @@ export default function HeroScene({ onReady }: { onReady?: () => void }) {
   return (
     <div ref={wrap} className="absolute inset-0">
       <Canvas
-        dpr={[1, pinned ? 1.5 : 1.75]}
+        dpr={[1, pinned ? 1.25 : 1.75]}
         frameloop={pinned ? 'never' : visible ? 'always' : 'never'}
         camera={{ fov: 26, near: 0.1, far: 40, position: [0, 1.2, 5] }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}

@@ -1,4 +1,5 @@
 import { company } from '@/lib/content';
+import { MaxIcon } from './icons/MaxIcon';
 
 // Мессенджеры в шапке и меню: WhatsApp, Telegram, MAX. Ссылки — только подтверждённые (lib/content).
 // Пока ссылки нет, кнопка видна, но неактивна (aria-disabled) — не ведём клиента на чужой аккаунт.
@@ -23,7 +24,7 @@ const ITEMS = [
   },
   {
     key: 'max', label: 'MAX', href: company.maxHref, goal: 'max_click', hover: 'hover:bg-[#5b3df5] hover:text-white',
-    icon: <span aria-hidden="true" className="font-display text-[10.5px] font-extrabold tracking-[-0.02em]">MAX</span>,
+    icon: <MaxIcon className="h-[22px] w-[22px]" />,
   },
 ] as const;
 
