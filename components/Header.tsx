@@ -7,6 +7,7 @@ import { company, nav } from '@/lib/content';
 import { LogoMark } from './Logo';
 import { LeadButton } from './LeadButton';
 import { Messengers } from './Messengers';
+import { CatalogMenu } from './CatalogMenu';
 
 /*
  * Шапка v3 (claude-web-skills, часть 4): плавающая + динамическая.
@@ -37,6 +38,16 @@ export function Header() {
   const tapeRef = useRef<HTMLSpanElement>(null);
   const openRef = useRef(false);
   const focusInside = useRef(false);
+  // выпадающий каталог: открытие с задержкой 80 мс (не мигает при проходе курсора), закрытие — 320 мс (курсор успевает дойти до панели по диагонали)
+  const [cat, setCat] = useState(false);
+  const catTimer = useRef(0);
+  const catBtn = useRef<HTMLButtonElement>(null);
+  const catZone = useRef<HTMLLIElement>(null);
+  const hoverCat = (next: boolean) => {
+    clearTimeout(catTimer.current);
+    catTimer.current = window.setTimeout(() => setCat(next), next ? 80 : 320);
+  };
+  const closeCat = () => { clearTimeout(catTimer.current); setCat(false); };
 
   useEffect(() => { openRef.current = open; }, [open]);
 
@@ -128,11 +139,26 @@ export function Header() {
 
   const shown = visible || open;
 
+  // каталог закрывается при смене страницы, когда шапка уезжает, по Escape и клику мимо
+  useEffect(() => { closeCat(); }, [pathname]);
+  useEffect(() => { if (!shown) closeCat(); }, [shown]);
+  useEffect(() => {
+    if (!cat) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { closeCat(); catBtn.current?.focus(); } };
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (!catZone.current?.contains(t) && !document.getElementById('catalog-menu')?.contains(t)) closeCat();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onDown);
+    return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('pointerdown', onDown); };
+  }, [cat]);
+
   return (
     <>
       <header className="pointer-events-none sticky top-0 z-[var(--z-header)] h-[var(--header-h)]">
         <div
-          className={`site-header wrap pt-3 transition-transform duration-[220ms] [transition-timing-function:var(--e-settle)] ${shown ? 'translate-y-0' : '-translate-y-[calc(100%+48px)]'}`}
+          className={`site-header wrap relative pt-3 transition-transform duration-[220ms] [transition-timing-function:var(--e-settle)] ${shown ? 'translate-y-0' : '-translate-y-[calc(100%+48px)]'}`}
           onFocusCapture={() => { focusInside.current = true; setVisible(true); }}
           onBlurCapture={() => { focusInside.current = false; }}
         >
@@ -152,15 +178,37 @@ export function Header() {
                 <span ref={tapeRef} aria-hidden="true" className="header-tape pointer-events-none absolute inset-y-1 left-0 rounded-[10px] opacity-0" />
                 {nav.map((item) => {
                   const on = active === item.href;
+                  const isCat = item.href === '/#catalog';
                   return (
-                    <li key={item.href} className="relative">
+                    <li
+                      key={item.href}
+                      ref={isCat ? catZone : undefined}
+                      className={`relative flex items-center ${isCat ? "after:absolute after:inset-x-0 after:top-full after:h-3 after:content-['']" : ''}`}
+                      onPointerEnter={isCat ? (e) => { if (e.pointerType === 'mouse') hoverCat(true); } : undefined}
+                      onPointerLeave={isCat ? (e) => { if (e.pointerType === 'mouse') hoverCat(false); } : undefined}
+                    >
                       <Link
                         href={item.href}
                         aria-current={on ? (item.href.includes('#') ? 'location' : 'page') : undefined}
-                        className={`header-link relative flex h-11 items-center rounded-[10px] px-3.5 text-[14.5px] font-medium transition-colors duration-200 ${on ? 'text-ink' : 'text-bone/70'}`}
+                        onClick={isCat ? closeCat : undefined}
+                        className={`header-link relative flex h-11 items-center rounded-[10px] text-[14.5px] font-medium transition-colors duration-200 ${isCat ? 'pl-3.5 pr-7' : 'px-3.5'} ${on ? 'text-ink' : cat && isCat ? 'text-bone' : 'text-bone/70'}`}
                       >
                         {item.label}
                       </Link>
+                      {/* раскрытие с клавиатуры и тапом: сама ссылка по-прежнему ведёт к каталогу на главной */}
+                      {isCat && (
+                        <button
+                          ref={catBtn}
+                          type="button"
+                          aria-expanded={cat}
+                          aria-controls="catalog-menu"
+                          aria-label="Разделы каталога"
+                          onClick={() => setCat((v) => !v)}
+                          className={`header-link absolute right-1 top-1/2 grid h-7 w-6 -translate-y-1/2 place-items-center rounded-md ${on ? 'text-ink' : 'text-bone/70'}`}
+                        >
+                          <svg aria-hidden="true" viewBox="0 0 190 88" className={`h-[6px] w-[11px] transition-transform duration-200 ${cat ? 'rotate-180' : ''}`}><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
+                        </button>
+                      )}
                     </li>
                   );
                 })}
@@ -197,6 +245,15 @@ export function Header() {
               </button>
             </div>
           </div>
+          {cat && (
+            <CatalogMenu
+              id="catalog-menu"
+              pathname={pathname}
+              onPointerEnter={() => hoverCat(true)}
+              onPointerLeave={() => hoverCat(false)}
+              onNavigate={closeCat}
+            />
+          )}
         </div>
       </header>
 
