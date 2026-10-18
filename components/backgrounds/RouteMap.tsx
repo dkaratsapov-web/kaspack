@@ -1,5 +1,7 @@
+import { FIT, MAP_H, MAP_W, RUSSIA_D } from '@/lib/geo/russia-outline';
+
 // «По всей России»: маршруты со склада в Твери. Города — по реальным координатам в конической проекции
-// Ламберта (как на картах России), без контура страны: только точки и дуги. Дуги прорисовываются со скроллом
+// Ламберта (как на картах России), поверх контура страны в той же проекции. Дуги прорисовываются со скроллом
 // (CSS scroll-driven, без JS); без поддержки или при «уменьшить движение» карта показана целиком.
 // Города — крупные узлы для наглядности масштаба, а не список обязательств по доставке.
 
@@ -38,16 +40,11 @@ const CITIES: City[] = [
 ];
 const LABELED = new Set(['Санкт-Петербург', 'Калининград', 'Мурманск', 'Краснодар', 'Казань', 'Екатеринбург', 'Новосибирск', 'Красноярск', 'Иркутск', 'Якутск', 'Владивосток']);
 
-// вписываем проекцию в viewBox 1000 × 440 с полями
-const W = 1000, H = 440, PAD = 40;
-const raw = [HUB, ...CITIES].map((c) => project(c.lon, c.lat));
-const minX = Math.min(...raw.map((p) => p.x)), maxX = Math.max(...raw.map((p) => p.x));
-const minY = Math.min(...raw.map((p) => p.y)), maxY = Math.max(...raw.map((p) => p.y));
-const k = Math.min((W - PAD * 2) / (maxX - minX), (H - PAD * 2) / (maxY - minY));
-const offX = (W - (maxX - minX) * k) / 2, offY = (H - (maxY - minY) * k) / 2;
+// рамка — по контуру страны (её считает генератор контура), города ложатся в ту же систему координат
+const W = MAP_W, H = MAP_H;
 const toView = (c: City) => {
   const p = project(c.lon, c.lat);
-  return { x: offX + (p.x - minX) * k, y: H - (offY + (p.y - minY) * k) };
+  return { x: FIT.offX + (p.x - FIT.minX) * FIT.k, y: H - (FIT.offY + (p.y - FIT.minY) * FIT.k) };
 };
 
 const hub = toView(HUB);
@@ -68,6 +65,8 @@ const LABEL_OFFSET: Record<NonNullable<City['label']>, [number, number, 'start' 
 export function RouteMap() {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="route-map h-auto w-full overflow-visible" aria-hidden="true">
+      {/* контур страны: тихая заливка и тонкая линия — фон для маршрутов, не главный герой */}
+      <path d={RUSSIA_D} className="route-country" />
       {routes.map((r, idx) => (
         <path key={r.name} d={r.d} pathLength={1} className="route-arc" style={{ ['--i' as string]: idx }} />
       ))}
