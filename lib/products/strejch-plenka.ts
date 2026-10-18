@@ -37,10 +37,10 @@ export const strejchPlenka: ProductPage = {
     title: 'Рассчитаем плёнку под ваш груз',
     note: 'Отметьте, что знаете. Остальное менеджер уточнит по телефону и пришлёт стоимость с доставкой.',
     fields: [
-      { id: 'type', label: 'Вид', kind: 'chips', options: ['Ручная', 'Машинная', 'Подскажите'] },
+      { id: 'type', label: 'Вид', kind: 'chips', options: ['Ручная', 'Машинная'] },
       { id: 'width', label: 'Ширина', kind: 'number', unit: 'мм', placeholder: '500', hint: '125–500 мм' },
-      { id: 'thickness', label: 'Толщина, мкм', kind: 'chips', options: ['17', '20', '23', 'Подскажите'] },
-      { id: 'raw', label: 'Сырьё', kind: 'chips', options: ['Первичное', 'Вторичное', 'Подскажите'] },
+      { id: 'thickness', label: 'Толщина, мкм', kind: 'chips', options: ['17', '20', '23'] },
+      { id: 'raw', label: 'Сырьё', kind: 'chips', options: ['Первичное', 'Вторичное'] },
       { id: 'volume', label: 'Объём', kind: 'number', units: ['рулонов', 'паллет'], placeholder: '50' },
       { id: 'period', label: 'Как часто', kind: 'chips', options: ['Разово', 'Каждый месяц', 'Чаще'] },
       { id: 'comment', label: 'Что упаковываете', kind: 'textarea', placeholder: 'Например: короба на европоддоне, около 600 кг' },
