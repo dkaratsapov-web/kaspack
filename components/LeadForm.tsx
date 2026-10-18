@@ -9,7 +9,7 @@ import { formatPhone, submitLead } from '@/lib/lead';
 type Status = 'idle' | 'sending' | 'ok' | 'error';
 
 // Короткая форма (бриф, решение 6): имя + телефон + согласие. Ошибки при уходе с поля.
-export function LeadForm({ source, layout = 'inline', product }: { source: string; layout?: 'inline' | 'stack' | 'pair'; product?: string }) {
+export function LeadForm({ source, layout = 'inline', product, cta = 'Получить расчёт' }: { source: string; layout?: 'inline' | 'stack' | 'pair'; product?: string; cta?: string }) {
   const id = useId();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -83,7 +83,7 @@ export function LeadForm({ source, layout = 'inline', product }: { source: strin
           {show('phone') && <p id={`${id}-phone-err`} className="mt-1.5 text-sm text-danger">{show('phone')}</p>}
         </div>
         <button type="submit" className="btn btn-primary" disabled={status === 'sending'} data-goal={`cta_${source}`}>
-          {status === 'sending' ? 'Отправляем…' : 'Получить расчёт'}
+          {status === 'sending' ? 'Отправляем…' : cta}
           <svg className="chev h-3 w-4" viewBox="0 0 190 88" aria-hidden="true"><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
         </button>
       </div>

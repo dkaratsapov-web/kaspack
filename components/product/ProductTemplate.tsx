@@ -135,12 +135,12 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
       {page.guide && (
         <section aria-labelledby="guide-title" className="chapter field-lime grain relative isolate overflow-hidden">
           <ChevronField />
-          <div className="wrap relative grid gap-10 py-20 lg:grid-cols-12 lg:py-28">
-            <div className="lg:col-span-4">
+          <div className="wrap relative grid gap-10 py-20 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:py-28">
+            <div className="lg:col-span-4 lg:row-start-1">
               <h2 id="guide-title" className="title text-[clamp(2rem,3.4vw,3.4rem)] text-ink">{page.guide.title}</h2>
               <p className="lead mt-5 max-w-[34ch] text-ink/75">{page.guide.intro}</p>
             </div>
-            <ol className="grid gap-4 lg:col-span-8">
+            <ol className="grid gap-4 lg:col-span-8 lg:col-start-5 lg:row-span-2 lg:row-start-1">
               {page.guide.steps.map((s) => (
                 <li key={s.title} className="rounded-[24px] bg-white/85 p-6 backdrop-blur md:p-8">
                   <h3 className="font-display text-[clamp(1.25rem,1.8vw,1.6rem)] font-bold tracking-[-0.03em]">{s.title}</h3>
@@ -148,6 +148,13 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
                 </li>
               ))}
             </ol>
+            {/* короткая форма рядом с советами: кто не хочет разбираться сам, оставляет телефон.
+                На десктопе — под заголовком, на телефоне — после советов */}
+            <div className="max-w-[30rem] self-start rounded-[24px] bg-white/85 p-4 text-ink backdrop-blur md:p-5 lg:col-span-4 lg:col-start-1 lg:row-start-2">
+              <p className="px-1 font-display text-[clamp(1.2rem,1.6vw,1.45rem)] font-bold tracking-[-0.03em]">Поможем с подбором</p>
+              <p className="mb-4 mt-1 px-1 text-[15px] text-ink-soft">Менеджер расспросит о грузе и предложит подходящий вариант.</p>
+              <LeadForm source={`product_${page.slug}_guide`} layout="pair" product={page.hero.h1} cta="Помогите подобрать" />
+            </div>
           </div>
         </section>
       )}
