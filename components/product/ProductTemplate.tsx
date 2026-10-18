@@ -105,8 +105,9 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
               <h2 id="types-title" className="title max-w-[18ch] text-[clamp(2rem,3.4vw,3.4rem)]">{page.headings.types}</h2>
               <ul className={`mt-10 grid gap-4 md:grid-cols-2 ${page.types.length === 3 ? 'lg:grid-cols-3' : ''}`}>
                 {page.types.map((t) => (
-                  <li key={t.title} className="rounded-[28px] bg-surface p-7 shadow-[0_1px_0_var(--color-line)] md:p-9">
-                    <h3 className="font-display text-[clamp(1.4rem,2vw,1.9rem)] font-bold tracking-[-0.03em]">{t.title}</h3>
+                  <li key={t.title} className="min-w-0 rounded-[28px] bg-surface p-6 shadow-[0_1px_0_var(--color-line)] md:p-9">
+                    {/* hyphens: «Металлизированная» не распирает карточку на узком экране */}
+                    <h3 className="hyphens-auto break-words font-display text-[clamp(1.4rem,2vw,1.9rem)] font-bold tracking-[-0.03em]">{t.title}</h3>
                     <p className="mt-3 max-w-[46ch] text-ink-soft">{t.text}</p>
                     <ul className="mt-6 grid gap-2.5">
                       {t.points.map((p) => <li key={p} className="flex gap-3 text-[16px]"><Check dark />{p}</li>)}

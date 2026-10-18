@@ -26,7 +26,8 @@ export function Footer() {
       {/* вордмарк во всю ширину: тот же Unbounded, что несёт всю страницу */}
       <p aria-hidden="true" className="giant select-none px-3 text-center text-[17.6vw] leading-[0.8] text-lime/90 normal-case">kaspack</p>
       <div className="border-t border-white/10">
-        <div className="wrap flex flex-col gap-3 py-6 text-[13px] text-graphite-soft md:flex-row md:items-center md:justify-between">
+        {/* на телефоне снизу место под нижнюю панель «Позвонить / Рассчитать» — она не закрывает реквизиты */}
+        <div className="wrap flex flex-col gap-3 pb-[calc(5.75rem+env(safe-area-inset-bottom))] pt-6 text-[13px] text-graphite-soft md:flex-row md:items-center md:justify-between md:py-6">
           <p>© {new Date().getFullYear()} {company.legalName} · ИНН {company.inn}</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link href="/politika-obrabotki-personalnyh-dannyh" className="hover:text-white">Политика обработки персональных данных</Link>

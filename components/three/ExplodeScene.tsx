@@ -33,8 +33,10 @@ function Rig({ state, labels, guides }: { state: React.RefObject<PalletState>; l
     // вписываем груз в часть экрана под шапкой, с запасом под выноски сверху и снизу
     const height = STACK_TOP + 1.8 * THREE.MathUtils.smootherstep(e, 0, 1);
     const tan2 = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
-    const hdr = Math.min(0.2, HEADER_PX / size.height);
-    const vFit = (height * 1.42) / (1 - hdr) / tan2;
+    // запас под шапку и выноски — только в закреплённой сцене на десктопе; на телефоне выносок нет, кадр плотнее
+    const pinned = size.height > window.innerHeight * 0.8;
+    const hdr = pinned ? Math.min(0.2, HEADER_PX / size.height) : 0;
+    const vFit = (height * (pinned ? 1.42 : 1.18)) / (1 - hdr) / tan2;
     const hFit = (2.2 / cam.aspect) / tan2;
     const dist = Math.max(vFit, hFit);
     // центр кадра выше центра груза на половину шапки: груз опускается и не уходит под неё

@@ -70,7 +70,7 @@ export function Catalog() {
         Листайте вниз
         <svg viewBox="0 0 190 88" className="scroll-cue h-2.5 w-4 text-ink"><polygon points="0,0 95,59 190,0 190,23 95,88 0,23" fill="currentColor" /></svg>
       </p>
-      <div className="relative isolate overflow-hidden lg:sticky lg:top-0 lg:flex lg:h-[100svh] lg:flex-col lg:justify-center">
+      <div className="relative isolate overflow-hidden pb-16 lg:sticky lg:top-0 lg:pb-0 lg:flex lg:h-[100svh] lg:flex-col lg:justify-center">
         <BoneDrift />
         <div className="wrap flex w-full items-end justify-between gap-8 pt-24 lg:pt-20">
           <h2 id="catalog-title" data-stage-title className="title max-w-[14ch]">17 видов упаковки на одной ленте</h2>
@@ -83,7 +83,7 @@ export function Catalog() {
           <ul
             ref={track}
             data-track
-            className="relative z-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-4 [scrollbar-width:none] md:px-10 lg:snap-none lg:gap-8 lg:overflow-visible lg:will-change-transform"
+            className="relative z-10 flex snap-x snap-mandatory scroll-px-5 gap-5 overflow-x-auto px-5 pb-4 md:scroll-px-10 [scrollbar-width:none] md:px-10 lg:snap-none lg:gap-8 lg:overflow-visible lg:will-change-transform"
           >
             {categories.map((c, i) => (
               <li key={c.slug} className="group w-[72vw] shrink-0 snap-start sm:w-[42vw] lg:w-[min(30vw,460px)]">

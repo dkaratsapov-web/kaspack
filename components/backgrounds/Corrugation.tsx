@@ -17,6 +17,8 @@ export function Corrugation() {
         className="bg-parallax absolute inset-x-0 -inset-y-[10%] h-[120%] w-full object-cover"
       />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(198_156_109/0.86)_0%,rgb(198_156_109/0.62)_38%,rgb(198_156_109/0.12)_75%,rgb(198_156_109/0)_100%)]" />
+      {/* телефон: текст на всю ширину — подложка ровная, без прозрачного правого края */}
+      <div className="absolute inset-0 bg-[rgb(198_156_109/0.72)] lg:hidden" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(198_156_109/0.35)_0%,transparent_30%,transparent_80%,rgb(42_31_20/0.18)_100%)]" />
     </div>
   );
