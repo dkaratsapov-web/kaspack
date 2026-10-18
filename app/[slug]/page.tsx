@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 import { categories, categoryDetails, company, families } from '@/lib/content';
 import { asset } from '@/lib/env';
 import { LeadForm } from '@/components/LeadForm';
+import { ProductTemplate } from '@/components/product/ProductTemplate';
+import { getProductPage, type ProductPage } from '@/lib/products';
+
+const SITE = 'https://kaspack.ru';
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -14,6 +18,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const c = categories.find((x) => x.slug === slug);
   if (!c) return {};
+  const page = getProductPage(slug);
+  if (page) {
+    return {
+      title: page.seo.title,
+      description: page.seo.description,
+      alternates: { canonical: `/${slug}` },
+      openGraph: { type: 'website', title: page.seo.title, description: page.seo.description, url: `/${slug}`, images: [{ url: `/catalog/${slug}.webp`, width: 480, height: 480, alt: page.hero.h1 }] },
+    };
+  }
   // формула title старого сайта сохранена (бриф, SEO-миграция)
   return {
     title: `${c.title} купить оптом от производителя в Твери — Kaspack`,
@@ -26,6 +39,15 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const c = categories.find((x) => x.slug === slug);
   if (!c) notFound();
+  const page = getProductPage(slug);
+  if (page) {
+    return (
+      <>
+        <ProductJsonLd page={page} />
+        <ProductTemplate page={page} category={c} />
+      </>
+    );
+  }
   const d = categoryDetails[slug];
   const related = categories.filter((x) => x.family === c.family && x.slug !== slug).slice(0, 4);
 
@@ -85,4 +107,35 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       )}
     </>
   );
+}
+
+/** JSON-LD (schema-markup): хлебные крошки, товар и вопросы — ровно то, что видно на странице.
+ *  Product без offers: публичных цен нет, поэтому расширенного сниппета с ценой не будет, но тип и производитель понятны. */
+function ProductJsonLd({ page }: { page: ProductPage }) {
+  const url = `${SITE}/${page.slug}`;
+  const graph = [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Главная', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Каталог', item: `${SITE}/#catalog` },
+        { '@type': 'ListItem', position: 3, name: page.hero.h1, item: url },
+      ],
+    },
+    {
+      '@type': 'Product',
+      name: page.hero.h1,
+      description: page.hero.lead,
+      image: `${SITE}/catalog/${page.slug}.webp`,
+      url,
+      brand: { '@type': 'Brand', name: company.name },
+      manufacturer: { '@type': 'Organization', name: company.legalName, url: SITE },
+      additionalProperty: page.specs.flatMap((g) => g.rows).map(([name, value]) => ({ '@type': 'PropertyValue', name, value })),
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: page.faq.map((x) => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } })),
+    },
+  ];
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c') }} />;
 }

@@ -18,6 +18,8 @@ export function formatPhone(raw: string) {
 export type Lead = {
   name: string; phone: string; consent: boolean; source: string; website?: string;
   products?: string[]; volume?: string; comment?: string;
+  /** поля гибкой формы товара: [подпись, значение] */
+  details?: [string, string][];
 };
 
 /** Отправка заявки. Без NEXT_PUBLIC_LEAD_ENDPOINT (превью на GitHub Pages) — демо без отправки. */

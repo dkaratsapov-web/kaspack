@@ -27,6 +27,8 @@ function validate(b) {
     page: clean(b.page, 200),
     volume: clean(b.volume, 300),
     products: Array.isArray(b.products) ? b.products.slice(0, 20).map((p) => clean(p, 80)) : [],
+    details: Array.isArray(b.details) ? b.details.slice(0, 12).filter((d) => Array.isArray(d)).map(([k, v]) => [clean(k, 60), clean(v, 300)]).filter(([k, v]) => k && v) : [],
+    comment: clean(b.comment, 600),
     utm: b.utm && typeof b.utm === 'object' ? Object.fromEntries(Object.entries(b.utm).slice(0, 6).map(([k, v]) => [clean(k, 30), clean(v, 120)])) : {},
   };
   if (b.consent !== true) return { error: 'consent' };
@@ -42,6 +44,8 @@ function text(lead) {
     `Телефон: ${lead.phone}`,
     lead.products.length ? `Товары: ${lead.products.join(', ')}` : '',
     lead.volume ? `Объём: ${lead.volume}` : '',
+    ...lead.details.map(([k, v]) => `${k}: ${v}`),
+    lead.comment ? `Комментарий: ${lead.comment}` : '',
     `Страница: ${lead.page || '/'}`,
     Object.keys(lead.utm).length ? `UTM: ${Object.entries(lead.utm).map(([k, v]) => `${k}=${v}`).join(' ')}` : '',
   ].filter(Boolean).join('\n');
