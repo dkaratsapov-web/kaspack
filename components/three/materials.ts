@@ -60,6 +60,10 @@ function create() {
     tape: new THREE.MeshPhysicalMaterial({ color: '#c79a5a', roughness: 0.22, transmission: 0.35, thickness: 0.3, clearcoat: 0.9 }),
     tapeEdge: new THREE.MeshStandardMaterial({ color: '#a77d45', roughness: 0.45 }),
     lime: new THREE.MeshPhysicalMaterial({ color: '#beea1f', roughness: 0.4, clearcoat: 0.4 }),
+    // витки на торце бобины ленты и ПЭТ-лента (классический зелёный ПЭТ)
+    limeEdge: new THREE.MeshStandardMaterial({ color: '#8fb312', roughness: 0.55 }),
+    pet: new THREE.MeshPhysicalMaterial({ color: '#3f7a3a', roughness: 0.35, clearcoat: 0.5 }),
+    petEdge: new THREE.MeshStandardMaterial({ color: '#2a5527', roughness: 0.5 }),
     graphite: new THREE.MeshStandardMaterial({ color: '#2b2f36', roughness: 0.6 }),
     steel: new THREE.MeshStandardMaterial({ color: '#d3d8de', roughness: 0.32, metalness: 0.85 }),
     cable: new THREE.MeshStandardMaterial({ color: '#23262c', roughness: 0.45 }),

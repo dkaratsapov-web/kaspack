@@ -269,28 +269,38 @@ export function Tape({ m }: P) {
   );
 }
 
-export function Strapping({ m }: P) {
-  const coil = useMemo(() => {
-    const pts: THREE.Vector3[] = [];
-    for (let i = 0; i <= 600; i++) {
-      const t = (i / 600) * Math.PI * 2 * 14, r = 0.18 + (i / 600) * 0.14;
-      pts.push(v(Math.cos(t) * r, (i / 600) * 0.004, Math.sin(t) * r));
-    }
-    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 1200, 0.006, 4, false);
-  }, []);
+/** Защитный уголок: L-профиль из картона, лежит рёбрами вверх. */
+function Corner({ m, len = 0.46, leg = 0.05 }: { m: Lib; len?: number; leg?: number }) {
+  const a = leg * Math.SQRT1_2;
   return (
     <group>
-      <group position={[0, 0, 0]}>
-        {Array.from({ length: 14 }, (_, i) => (
-          <mesh key={i} material={m.lime} position-y={0.03 + i * 0.012} castShadow>
-            <torusGeometry args={[0.18 + i * 0.0001, 0.006, 4, 1]} />
-          </mesh>
-        ))}
-        <mesh material={m.lime} position-y={0.1} castShadow><cylinderGeometry args={[0.33, 0.33, 0.18, 96, 1, true]} /></mesh>
-        <mesh material={m.lime} position-y={0.19} rotation-x={-Math.PI / 2}><ringGeometry args={[0.16, 0.33, 96]} /></mesh>
-        <mesh material={m.core} position-y={0.1}><cylinderGeometry args={[0.16, 0.16, 0.19, 64, 1, true]} /></mesh>
-        <primitive object={new THREE.Mesh(coil, m.lime)} visible={false} />
+      <mesh material={m.kraft} castShadow position={[0, a / 2, a / 2]} rotation-x={Math.PI / 4}><boxGeometry args={[len, 0.005, leg]} /></mesh>
+      <mesh material={m.kraft} castShadow position={[0, a / 2, -a / 2]} rotation-x={-Math.PI / 4}><boxGeometry args={[len, 0.005, leg]} /></mesh>
+    </group>
+  );
+}
+
+export function Strapping({ m }: P) {
+  // бобина ПП-ленты (лайм), за ней ПЭТ-лента (зелёная), спереди два защитных уголка; всё в круге r≈0.58 —
+  // при любом ракурсе стоит на ленте конвейера
+  return (
+    <group>
+      {/* две бобины ПП стопкой */}
+      {[0, 1].map((i) => (
+        <group key={i} position={[-0.12 + i * 0.015, i * 0.161, -0.02 - i * 0.01]}>
+          <Roll m={m} r={0.27} h={0.16} core={0.13} body={m.lime} />
+          <WindRings r={0.27} core={0.13} y={0.16} mat={m.limeEdge} />
+        </group>
+      ))}
+      {/* ПЭТ на ребре: ось вдоль x */}
+      <group position={[0.3, 0.2, -0.2]} rotation-z={Math.PI / 2}>
+        <group position-y={-0.06}>
+          <Roll m={m} r={0.2} h={0.12} core={0.1} body={m.pet} />
+          <WindRings r={0.2} core={0.1} y={0.12} mat={m.petEdge} />
+        </group>
       </group>
+      <group position={[0.2, 0, 0.28]} rotation-y={-0.12}><Corner m={m} /></group>
+      <group position={[0.17, 0, 0.4]} rotation-y={-0.2}><Corner m={m} len={0.4} /></group>
     </group>
   );
 }

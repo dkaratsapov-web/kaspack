@@ -37,7 +37,7 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
                 <li aria-current="page" className="text-ink-soft">{page.hero.h1}</li>
               </ol>
             </nav>
-            <p className="mt-8 text-[14px] font-semibold text-ink-soft">{families[category.family]} · своё производство в Твери</p>
+            <p className="mt-8 text-[14px] font-semibold text-ink-soft">{page.hero.eyebrow ?? `${families[category.family]} · своё производство в Твери`}</p>
             <h1 id="product-title" className="mt-3">
               <span className="giant block text-[clamp(2.9rem,7.4vw,8.2rem)] leading-[1.02]">{page.hero.h1}</span>
               <span className="title mt-2 block text-[clamp(1.6rem,3vw,3rem)] text-ink-soft">{page.hero.kicker}</span>
@@ -77,7 +77,7 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
             <ul className="mt-8 grid gap-3 text-[16px] text-graphite-ink">
               <li className="flex gap-3"><Check />Ответ за {company.responseMinutes} минут в рабочее время</li>
               <li className="flex gap-3"><Check />Доставка своим автопарком по России</li>
-              <li className="flex gap-3"><Check />Любой объём: от одного рулона до регулярных поставок</li>
+              <li className="flex gap-3"><Check />Любой объём: от разовой закупки до регулярных поставок</li>
             </ul>
           </div>
           <div className="lg:col-span-7">
@@ -94,7 +94,7 @@ export function ProductTemplate({ page, category }: { page: ProductPage; categor
           {page.types && (
             <>
               <h2 id="types-title" className="title max-w-[18ch] text-[clamp(2rem,3.4vw,3.4rem)]">{page.headings.types}</h2>
-              <ul className="mt-10 grid gap-4 md:grid-cols-2">
+              <ul className={`mt-10 grid gap-4 md:grid-cols-2 ${page.types.length === 3 ? 'lg:grid-cols-3' : ''}`}>
                 {page.types.map((t) => (
                   <li key={t.title} className="rounded-[28px] bg-surface p-7 shadow-[0_1px_0_var(--color-line)] md:p-9">
                     <h3 className="font-display text-[clamp(1.4rem,2vw,1.9rem)] font-bold tracking-[-0.03em]">{t.title}</h3>
