@@ -186,9 +186,10 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 }
 .explode-guide[data-on='true'] { opacity: 0.45; }
 .explode-label { will-change: transform; }
-.explode-label > span { transition: opacity 400ms var(--ease-out), translate 400ms var(--ease-out); }
-.explode-label[data-on='false'] > span { opacity: 0; translate: 0 6px; }
-.explode-label[data-on='true'] > span { opacity: 1; translate: 0 0; }
+/* появление через transform: свойство translate занято сдвигом карточки (над линией или по центру) */
+.explode-label > span { transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out); }
+.explode-label[data-on='false'] > span { opacity: 0; transform: translateY(6px); }
+.explode-label[data-on='true'] > span { opacity: 1; transform: none; }
 
 /* Конвейер каталога (референс заказчика): полотно — тёмная лента в перспективе, светлее у дальнего края,
    поперечные стыки едут вместе с товарами (background-position пишет Catalog); борт — хром; рама с заглушками роликов. */

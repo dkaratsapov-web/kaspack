@@ -129,7 +129,8 @@ export function Explode() {
                 <div key={l.key} ref={(el) => { labels.current[l.key] = el; }} data-on="false" className="explode-label absolute left-0 top-0">
                   <span className="absolute -left-[5px] -top-[5px] h-[10px] w-[10px] rounded-full bg-lime shadow-[0_0_0_4px_rgb(190_234_31/0.25)]" />
                   <span className={`absolute top-0 h-px w-14 bg-lime/70 ${l.side === 'left' ? 'right-0' : 'left-0'}`} />
-                  <span className={`absolute top-0 w-[220px] ${l.key === 'film' ? '-translate-y-[calc(100%-6px)]' : '-translate-y-1/2'} rounded-[14px] border border-white/10 bg-graphite-2/90 px-4 py-3 backdrop-blur ${l.side === 'left' ? 'right-16' : 'left-16'}`}>
+                  {/* плёнка и поддон — крайние слои: карточка над линией, чтобы не уходить под шапку и за низ экрана */}
+                  <span className={`absolute top-0 w-[220px] ${l.key === 'film' || l.key === 'pallet' ? '-translate-y-[calc(100%-6px)]' : '-translate-y-1/2'} rounded-[14px] border border-white/10 bg-graphite-2/90 px-4 py-3 backdrop-blur ${l.side === 'left' ? 'right-16' : 'left-16'}`}>
                     <span className="block text-[15px] font-semibold text-white">{l.title}</span>
                     <span className="mt-0.5 block text-[13px] leading-snug text-graphite-soft">{l.spec}</span>
                   </span>

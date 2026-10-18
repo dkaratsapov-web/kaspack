@@ -10,6 +10,8 @@ import { Studio } from './Studio';
 export type LabelRefs = Record<'film' | 'strap' | 'tier' | 'pallet', HTMLElement | null>;
 /** Порог разбора, после которого выноска слоя появляется. */
 const SHOW_AT: Record<keyof LabelRefs, number> = { film: 0.18, strap: 0.38, tier: 0.58, pallet: 0.75 };
+/** Плавающая шапка (капсула с отступом) перекрывает верх закреплённой сцены. */
+const HEADER_PX = 88;
 
 function Rig({ state, labels, guides }: { state: React.RefObject<PalletState>; labels: React.RefObject<LabelRefs>; guides?: React.RefObject<LabelRefs> }) {
   const group = useRef<THREE.Group>(null);
@@ -28,12 +30,17 @@ function Rig({ state, labels, guides }: { state: React.RefObject<PalletState>; l
 
     // кадр растёт вместе с разбором
     const cam = camera as THREE.PerspectiveCamera;
+    // вписываем груз в часть экрана под шапкой, с запасом под выноски сверху и снизу
     const height = STACK_TOP + 1.8 * THREE.MathUtils.smootherstep(e, 0, 1);
-    const target = new THREE.Vector3(0, height * 0.5, 0);
-    const vFit = (height * 1.25) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
-    const hFit = (2.2 / cam.aspect) / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)));
+    const tan2 = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+    const hdr = Math.min(0.2, HEADER_PX / size.height);
+    const vFit = (height * 1.42) / (1 - hdr) / tan2;
+    const hFit = (2.2 / cam.aspect) / tan2;
+    const dist = Math.max(vFit, hFit);
+    // центр кадра выше центра груза на половину шапки: груз опускается и не уходит под неё
+    const target = new THREE.Vector3(0, height * 0.5 + (dist * tan2 * hdr) / 2, 0);
     const dir = new THREE.Vector3(0, 0.32, 1).normalize();
-    cam.position.copy(target).addScaledVector(dir, Math.max(vFit, hFit));
+    cam.position.copy(target).addScaledVector(dir, dist);
     cam.lookAt(target);
 
     // выноски: проецируем 3D-якоря в координаты экрана, без перерисовки React
