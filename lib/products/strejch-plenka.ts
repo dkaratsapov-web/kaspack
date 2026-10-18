@@ -39,7 +39,7 @@ export const strejchPlenka: ProductPage = {
     fields: [
       { id: 'type', label: 'Вид', kind: 'chips', options: ['Ручная', 'Машинная', 'Подскажите'] },
       { id: 'width', label: 'Ширина', kind: 'number', unit: 'мм', placeholder: '500', hint: '125–500 мм' },
-      { id: 'thickness', label: 'Толщина', kind: 'chips', options: ['17 мкм', '20 мкм', '23 мкм', 'Подскажите'] },
+      { id: 'thickness', label: 'Толщина, мкм', kind: 'chips', options: ['17', '20', '23', 'Подскажите'] },
       { id: 'raw', label: 'Сырьё', kind: 'chips', options: ['Первичное', 'Вторичное', 'Подскажите'] },
       { id: 'volume', label: 'Объём', kind: 'number', units: ['рулонов', 'паллет'], placeholder: '50' },
       { id: 'period', label: 'Как часто', kind: 'chips', options: ['Разово', 'Каждый месяц', 'Чаще'] },

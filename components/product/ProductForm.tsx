@@ -92,18 +92,21 @@ export function ProductForm({ product, source, fields }: { product: string; sour
         <label>Сайт <input name="website" aria-label="Не заполняйте это поле" tabIndex={-1} autoComplete="off" /></label>
       </div>
 
+      {/* поля товара в две колонки: короткие парами, текст и широкие (wide) на всю строку */}
+      <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
       {fields.map((f) => {
         const fid = `${id}-${f.id}`;
+        const span = f.wide || f.kind === 'textarea' ? 'sm:col-span-2' : '';
         if (f.kind === 'chips') {
           const cur = values[f.id];
           return (
-            <fieldset key={f.id}>
+            <fieldset key={f.id} className={`min-w-0 ${span}`}>
               <legend className="mb-2 text-[14px] font-semibold text-ink">{f.label}{f.hint && <span className="ml-2 font-normal text-ink-mute">{f.hint}</span>}</legend>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {f.options.map((o) => {
                   const on = Array.isArray(cur) ? cur.includes(o) : cur === o;
                   return (
-                    <label key={o} className={`chip ${on ? 'chip-on' : ''}`}>
+                    <label key={o} className={`chip px-3 ${on ? 'chip-on' : ''}`}>
                       <input
                         type={f.multiple ? 'checkbox' : 'radio'} name={fid} value={o} checked={on}
                         onChange={() => toggle(f, o)} onClick={() => { if (!f.multiple && on) toggle(f, o); }}
@@ -119,10 +122,10 @@ export function ProductForm({ product, source, fields }: { product: string; sour
         }
         if (f.kind === 'number') {
           return (
-            <div key={f.id}>
+            <div key={f.id} className={`min-w-0 ${span}`}>
               <label htmlFor={fid} className="mb-2 block text-[14px] font-semibold text-ink">{f.label}{f.hint && <span className="ml-2 font-normal text-ink-mute">{f.hint}</span>}</label>
               <div className="flex gap-2">
-                <div className="relative w-full max-w-[14rem]">
+                <div className="relative min-w-0 flex-1">
                   <input
                     id={fid} className="field tabular pr-12" inputMode="numeric" placeholder={f.placeholder}
                     value={(values[f.id] as string) ?? ''} onChange={(e) => setValues((v) => ({ ...v, [f.id]: e.target.value.replace(/[^\d.,]/g, '').slice(0, 7) }))}
@@ -130,11 +133,11 @@ export function ProductForm({ product, source, fields }: { product: string; sour
                   {f.unit && <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[14px] text-ink-mute">{f.unit}</span>}
                 </div>
                 {f.units && (
-                  <div className="flex gap-2" role="group" aria-label={`${f.label}: единица`}>
+                  <div className="flex shrink-0 gap-2" role="group" aria-label={`${f.label}: единица`}>
                     {f.units.map((u) => {
                       const on = (units[f.id] ?? f.units![0]) === u;
                       return (
-                        <button key={u} type="button" aria-pressed={on} onClick={() => setUnits((x) => ({ ...x, [f.id]: u }))} className={`chip ${on ? 'chip-on' : ''}`}>{u}</button>
+                        <button key={u} type="button" aria-pressed={on} onClick={() => setUnits((x) => ({ ...x, [f.id]: u }))} className={`chip px-3 ${on ? 'chip-on' : ''}`}>{u}</button>
                       );
                     })}
                   </div>
@@ -144,7 +147,7 @@ export function ProductForm({ product, source, fields }: { product: string; sour
           );
         }
         return (
-          <div key={f.id}>
+          <div key={f.id} className={`min-w-0 ${span}`}>
             <label htmlFor={fid} className="mb-2 block text-[14px] font-semibold text-ink">{f.label} <span className="font-normal text-ink-mute">(необязательно)</span></label>
             {f.kind === 'textarea' ? (
               <textarea id={fid} rows={2} className="field min-h-[84px] resize-y py-3" placeholder={f.placeholder} value={(values[f.id] as string) ?? ''} onChange={(e) => setValues((v) => ({ ...v, [f.id]: e.target.value.slice(0, 600) }))} />
@@ -154,6 +157,7 @@ export function ProductForm({ product, source, fields }: { product: string; sour
           </div>
         );
       })}
+      </div>
 
       <div className="grid gap-3 border-t border-line pt-5 sm:grid-cols-2">
         <div>

@@ -169,9 +169,15 @@ export function Header() {
 
             <div className="flex items-center gap-2">
               <Messengers tone="dark" className="hidden xl:flex" />
-              <a href={company.phoneHref} className="header-phone hidden h-11 items-center rounded-xl px-3 text-[14.5px] font-semibold tabular text-bone xl:flex" data-goal="tel_click">
-                {company.phone}
-              </a>
+              {/* телефон и почта столбиком: ширина капсулы не растёт */}
+              <div className="hidden flex-col items-start px-1 leading-tight xl:flex">
+                <a href={company.phoneHref} className="header-phone whitespace-nowrap rounded-md px-2 text-[14.5px] font-semibold tabular text-bone" data-goal="tel_click">
+                  {company.phone}
+                </a>
+                <a href={`mailto:${company.email}`} className="header-phone rounded-md px-2 text-[12.5px] font-medium text-bone/60 transition-colors hover:text-bone" data-goal="email_click">
+                  {company.email}
+                </a>
+              </div>
               <LeadButton source="header" className="btn btn-primary header-cta hidden !min-h-[44px] !rounded-[14px] !px-4 !text-[14.5px] sm:inline-flex">
                 Рассчитать заказ
               </LeadButton>
@@ -218,6 +224,7 @@ export function Header() {
           <div className="mt-auto grid gap-3 pt-10">
             <LeadButton source="menu" onBeforeOpen={() => setOpen(false)}>Рассчитать заказ</LeadButton>
             <a href={company.phoneHref} className="btn tabular !text-bone ring-1 ring-white/20">{company.phone}</a>
+            <a href={`mailto:${company.email}`} className="text-center text-[15px] font-medium text-bone/70" data-goal="email_click">{company.email}</a>
             <Messengers tone="dark" size="lg" className="mt-2 justify-center gap-3" />
           </div>
         </div>

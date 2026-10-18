@@ -67,24 +67,25 @@ export function BoppFilm({ m }: P) {
 }
 
 export function BubbleWrap({ m }: P) {
+  // лист короткий и по ширине рулона: при любом ракурсе товар целиком стоит на ленте конвейера
   const bubbles = useMemo(() => {
     const g = new THREE.SphereGeometry(0.022, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-    const mesh = new THREE.InstancedMesh(g, m.bubble, 14 * 18);
+    const mesh = new THREE.InstancedMesh(g, m.bubble, 13 * 6);
     const o = new THREE.Object3D();
     let i = 0;
-    for (let a = 0; a < 14; a++) for (let b = 0; b < 18; b++) {
-      o.position.set(-0.36 + a * 0.054 + (b % 2) * 0.027, 0.003, 0.05 + b * 0.05);
+    for (let a = 0; a < 13; a++) for (let b = 0; b < 6; b++) {
+      o.position.set(-0.33 + a * 0.054 + (b % 2) * 0.027, 0.003, 0.05 + b * 0.05);
       o.updateMatrix(); mesh.setMatrixAt(i++, o.matrix);
     }
     return mesh;
   }, [m]);
   return (
     <group>
-      <group rotation-z={Math.PI / 2} position={[0.42, 0.24, -0.2]}>
-        <Roll m={m} r={0.24} h={0.84} core={0.06} body={m.bubble} />
+      <group rotation-z={Math.PI / 2} position={[0.36, 0.24, -0.14]}>
+        <Roll m={m} r={0.24} h={0.72} core={0.06} body={m.bubble} />
       </group>
-      <mesh material={m.bubble} rotation-x={-Math.PI / 2} position={[0, 0.002, 0.5]}>
-        <planeGeometry args={[0.84, 0.9]} />
+      <mesh material={m.bubble} rotation-x={-Math.PI / 2} position={[0, 0.002, 0.23]}>
+        <planeGeometry args={[0.72, 0.3]} />
       </mesh>
       <primitive object={bubbles} position={[0, 0.003, 0.05]} />
     </group>
@@ -163,23 +164,16 @@ export function Gofrotara({ m }: P) {
 }
 
 export function KraftPaper({ m }: P) {
-  const sheet = useMemo(() => {
-    const g = new THREE.PlaneGeometry(0.84, 0.9, 1, 24);
-    const p = g.attributes.position;
-    for (let i = 0; i < p.count; i++) {
-      const y = p.getY(i);
-      p.setZ(i, Math.max(0, (0.45 - y)) * 0.0); // плоский лист на полу
-    }
-    g.computeVertexNormals();
-    return g;
-  }, []);
+  // как у плёнки: короткий отмотанный лист по ширине рулона, чтобы товар не выходил за ленту конвейера
   return (
     <group>
-      <group rotation-z={Math.PI / 2} position={[0.42, 0.22, -0.2]}>
-        <Roll m={m} r={0.22} h={0.84} core={0.05} body={m.kraftPaper} />
-        <WindRings r={0.22} core={0.05} y={0.84} mat={m.core} />
+      <group rotation-z={Math.PI / 2} position={[0.36, 0.22, -0.14]}>
+        <Roll m={m} r={0.22} h={0.72} core={0.05} body={m.kraftPaper} />
+        <WindRings r={0.22} core={0.05} y={0.72} mat={m.core} />
       </group>
-      <mesh geometry={sheet} material={m.kraftPaper} rotation-x={-Math.PI / 2} position={[0, 0.002, 0.38]} receiveShadow />
+      <mesh material={m.kraftPaper} rotation-x={-Math.PI / 2} position={[0, 0.002, 0.23]} receiveShadow>
+        <planeGeometry args={[0.72, 0.3]} />
+      </mesh>
     </group>
   );
 }

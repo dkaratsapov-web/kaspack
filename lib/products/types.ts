@@ -2,11 +2,12 @@
 // SEO-полями и набором полей формы. Общие только вёрстка и компоненты.
 // Правило: в контент попадают только подтверждённые факты (бриф, решение 11); где цифр нет — формулируем качественно.
 
-/** Поле гибкой формы заявки под товар. */
+/** Поле гибкой формы заявки под товар. Поля идут парами в две колонки; wide (и textarea) — на всю строку. */
+type FieldBase = { id: string; label: string; hint?: string; wide?: boolean };
 export type FormField =
-  | { id: string; label: string; kind: 'chips'; options: string[]; multiple?: boolean; hint?: string }
-  | { id: string; label: string; kind: 'number'; unit?: string; units?: string[]; placeholder?: string; hint?: string }
-  | { id: string; label: string; kind: 'text' | 'textarea'; placeholder?: string; hint?: string };
+  | (FieldBase & { kind: 'chips'; options: string[]; multiple?: boolean })
+  | (FieldBase & { kind: 'number'; unit?: string; units?: string[]; placeholder?: string })
+  | (FieldBase & { kind: 'text' | 'textarea'; placeholder?: string });
 
 export type ProductPage = {
   slug: string;
