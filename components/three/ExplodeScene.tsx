@@ -72,6 +72,19 @@ function Rig({ state, labels, guides }: { state: React.RefObject<PalletState>; l
   );
 }
 
+/** Прогрев в простое: компилируем шейдеры и рисуем один кадр (текстуры уходят в GPU) до того, как сцена понадобится. */
+function Warm() {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const run = () => { gl.compile(scene, camera); gl.render(scene, camera); };
+    if (!w.requestIdleCallback) { const t = setTimeout(run, 200); return () => clearTimeout(t); }
+    const id = w.requestIdleCallback(run, { timeout: 4000 });
+    return () => w.cancelIdleCallback?.(id);
+  }, [gl, scene, camera]);
+  return null;
+}
+
 export default function ExplodeScene({ state, labels, guides }: { state: React.RefObject<PalletState>; labels: React.RefObject<LabelRefs>; guides?: React.RefObject<LabelRefs> }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -95,6 +108,7 @@ export default function ExplodeScene({ state, labels, guides }: { state: React.R
         <Suspense fallback={null}>
           <Studio dark />
           <Rig state={state} labels={labels} guides={guides} />
+          <Warm />
           <ContactShadows position={[0, 0, 0]} opacity={0.65} scale={5} blur={2.6} far={2} resolution={512} color="#000000" />
         </Suspense>
       </Canvas>

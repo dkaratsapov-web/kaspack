@@ -49,6 +49,22 @@ export function Explode() {
 
     const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setMount(true); io.disconnect(); } }, { rootMargin: '600px' });
     io.observe(el);
+    // сцену создаём заранее, в простое, пока смотрят первый экран: её шейдеры и текстуры готовятся
+    // не в конце каталога, где это давало рывок перед последними товарами
+    // запуск — после паузы в прокрутке, чтобы подготовка не пришлась на движение первого экрана
+    let idle = 0, early = 0;
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const arm = (ms: number) => {
+      clearTimeout(early);
+      early = window.setTimeout(() => {
+        removeEventListener('scroll', onQuiet);
+        if (ric) idle = ric(() => setMount(true), { timeout: 3000 });
+        else setMount(true);
+      }, ms);
+    };
+    const onQuiet = () => arm(1200);
+    addEventListener('scroll', onQuiet, { passive: true });
+    arm(5000);
 
     const apply = (e: number) => {
       state.current.explode = e;
@@ -59,7 +75,8 @@ export function Explode() {
       setChapter((prev) => (prev === idx ? prev : idx));
     };
 
-    if (reduced || !desktop) { apply(1); return () => io.disconnect(); }
+    const stopEarly = () => { clearTimeout(early); removeEventListener('scroll', onQuiet); (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(idle); };
+    if (reduced || !desktop) { apply(1); return () => { io.disconnect(); stopEarly(); }; }
 
     let kill: (() => void) | undefined;
     (async () => {
@@ -75,7 +92,7 @@ export function Explode() {
       });
       kill = () => st.kill();
     })();
-    return () => { io.disconnect(); kill?.(); };
+    return () => { io.disconnect(); stopEarly(); kill?.(); };
   }, []);
 
   return (
