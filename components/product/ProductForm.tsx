@@ -124,8 +124,9 @@ export function ProductForm({ product, source, fields }: { product: string; sour
           return (
             <div key={f.id} className={`min-w-0 ${span}`}>
               <label htmlFor={fid} className="mb-2 block text-[14px] font-semibold text-ink">{f.label}{f.hint && <span className="ml-2 font-normal text-ink-mute">{f.hint}</span>}</label>
-              <div className="flex gap-2">
-                <div className="relative min-w-0 flex-1">
+              {/* с выбором единиц поле короткое (под число), единицы — вплотную к нему */}
+              <div className="flex items-center gap-1.5">
+                <div className={`relative min-w-0 ${f.units ? 'w-[7.5rem] shrink-0' : 'flex-1'}`}>
                   <input
                     id={fid} className="field tabular pr-12" inputMode="numeric" placeholder={f.placeholder}
                     value={(values[f.id] as string) ?? ''} onChange={(e) => setValues((v) => ({ ...v, [f.id]: e.target.value.replace(/[^\d.,]/g, '').slice(0, 7) }))}
@@ -133,7 +134,7 @@ export function ProductForm({ product, source, fields }: { product: string; sour
                   {f.unit && <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[14px] text-ink-mute">{f.unit}</span>}
                 </div>
                 {f.units && (
-                  <div className="flex shrink-0 gap-2" role="group" aria-label={`${f.label}: единица`}>
+                  <div className="flex shrink-0 gap-1.5" role="group" aria-label={`${f.label}: единица`}>
                     {f.units.map((u) => {
                       const on = (units[f.id] ?? f.units![0]) === u;
                       return (

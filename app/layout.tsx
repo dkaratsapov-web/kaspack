@@ -53,7 +53,7 @@ const orgJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${unbounded.variable} ${onest.variable}`} suppressHydrationWarning>
+    <html lang="ru" data-scroll-behavior="smooth" className={`${unbounded.variable} ${onest.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: introBootScript }} />
       </head>
