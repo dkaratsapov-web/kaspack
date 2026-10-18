@@ -100,7 +100,7 @@ export function Catalog() {
                     />
                     <span aria-hidden="true" className="spin-sprite absolute inset-0" style={{ ['--spin' as string]: `url(${asset(`/catalog/${c.slug}-spin.webp`)})` }} />
                   </div>
-                  <div data-stage-fade>
+                  <div data-stage-fade className="lg:mt-[calc(min(30vw,460px)*0.1)]">
                     <p className="mt-3 text-[14px] font-semibold text-ink-mute tabular">{String(i + 1).padStart(2, '0')} · {families[c.family]}</p>
                     <h3 className="mt-1.5 font-display text-[clamp(1.25rem,1.6vw,1.65rem)] font-bold leading-[1.08] tracking-[-0.03em]">{c.title}</h3>
                     <p className="mt-2 max-w-[32ch] text-[15px] text-ink-soft">{c.spec}</p>
@@ -109,14 +109,14 @@ export function Catalog() {
               </li>
             ))}
           </ul>
-          {/* лента конвейера с роликами — едет вместе с товарами */}
-          <div
-            ref={belt}
-            data-stage-fade
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-[calc(min(30vw,460px)*0.86)] z-0 hidden h-5 bg-ink lg:block"
-            style={{ backgroundImage: 'radial-gradient(circle at 12px 10px, #4a4f58 0 5px, transparent 6px)', backgroundSize: '48px 20px' }}
-          />
+          {/* конвейер (по референсу заказчика): полотно в перспективе с хром-бортами едет вместе с товарами,
+              рама с роликами и стойки стоят на месте — как у настоящей ленты */}
+          <div data-stage-fade aria-hidden="true" className="conveyor pointer-events-none absolute inset-x-0 top-[calc(min(30vw,460px)*0.6)] z-0 hidden h-[calc(min(30vw,460px)*0.47)] lg:block">
+            <div ref={belt} className="conveyor-belt absolute inset-x-0 top-0 h-[57%]" />
+            <div className="conveyor-rail absolute inset-x-0 top-[57%] h-[4%]" />
+            <div className="conveyor-frame absolute inset-x-0 top-[61%] h-[22%]" />
+            <div className="conveyor-legs absolute inset-x-0 top-[83%] h-[17%]" />
+          </div>
         </div>
       </div>
     </section>
