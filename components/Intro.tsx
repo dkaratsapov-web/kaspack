@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react';
 import { LogoMark } from './Logo';
+import { HERO_HANDOFF } from '@/lib/features';
 
 /** Выполняется до первой отрисовки: решает, показывать ли интро (первый визит, без reduced motion). */
-export const introBootScript = `document.documentElement.classList.add('js');try{if(window.WebGLRenderingContext&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('kp-pin')}catch(e){}try{if(localStorage.getItem('kp_intro')!=='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.dataset.intro='1';localStorage.setItem('kp_intro','1')}}catch(e){}`;
+// kp-pin включает закреплённую сцену «товары из коробки → конвейер» — только при HERO_HANDOFF
+export const introBootScript = `document.documentElement.classList.add('js');${HERO_HANDOFF ? "try{if(window.WebGLRenderingContext&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('kp-pin')}catch(e){}" : ''}try{if(localStorage.getItem('kp_intro')!=='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.dataset.intro='1';localStorage.setItem('kp_intro','1')}}catch(e){}`;
 
 // Интро (бриф С8): шеврон логотипа 0,8 с поверх уже отрисованной страницы, не блокирует клики.
 export function Intro() {

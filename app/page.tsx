@@ -1,5 +1,7 @@
 import { Hero } from '@/components/Hero';
 import { Catalog } from '@/components/sections/Catalog';
+import { CatalogGrid } from '@/components/sections/CatalogGrid';
+import { HERO_HANDOFF } from '@/lib/features';
 import { HeroCatalogStage } from '@/components/HeroCatalogStage';
 import { Explode } from '@/components/sections/Explode';
 import { Custom } from '@/components/sections/Custom';
@@ -18,9 +20,10 @@ import { BoneDrift } from '@/components/backgrounds/BoneDrift';
 export default function HomePage() {
   return (
     <>
+      {/* сцена «товары из коробки → конвейер» сохранена и выключена (lib/features.ts); сейчас — сетка иконок */}
       <HeroCatalogStage>
         <Hero />
-        <Catalog />
+        {HERO_HANDOFF ? <Catalog /> : <CatalogGrid />}
       </HeroCatalogStage>
       <Explode />
       <Custom />

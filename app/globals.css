@@ -405,3 +405,64 @@ html[data-intro='1'] .intro-mark { animation: introMark 800ms var(--ease-out) bo
 @keyframes dialogIn { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: none; } }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .lead-dialog[open], .lead-dialog::backdrop { animation: none; } }
+
+/* ===== Каталог сеткой (CatalogGrid): плитки 6 + 6 + 5, иконки с микро-движением ===== */
+.cat-icon .ci-accent { stroke: var(--color-lime-ink); }
+.cat-icon g, .cat-icon circle, .cat-icon path { transform-box: fill-box; transform-origin: center; }
+.cat-tile { transition: transform 260ms var(--e-settle), background-color 220ms var(--ease-out), color 220ms var(--ease-out), box-shadow 260ms var(--ease-out); }
+.cat-tile:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; }
+/* иконка и подписи меняют цвет вместе с фоном — без мгновения «белое на белом» */
+.cat-icon-wrap, .cat-tile .text-ink-mute, .cat-tile .text-ink\/30 { transition: color 220ms var(--ease-out); }
+.cat-icon .ci-accent { transition: stroke 220ms var(--ease-out); }
+.cat-tile:is(:hover, :focus-visible) { background: var(--color-graphite); color: var(--color-bone); }
+.cat-tile:is(:hover, :focus-visible) .cat-icon-wrap { color: var(--color-bone); }
+.cat-tile:is(:hover, :focus-visible) .ci-accent { stroke: var(--color-lime); }
+.cat-tile:is(:hover, :focus-visible) .text-ink-mute, .cat-tile:is(:hover, :focus-visible) .text-ink\/30 { color: rgb(255 255 255 / 0.55); }
+@media (hover: hover) and (pointer: fine) {
+  .cat-tile:hover { transform: translateY(-4px); box-shadow: 0 18px 36px -22px rgb(14 16 20 / 0.55); }
+}
+/* клапаны короба держатся открытыми, пока курсор на плитке */
+.ci-flap-l { transform-origin: 100% 100%; transition: transform 420ms var(--e-settle); }
+.ci-flap-r { transform-origin: 0% 100%; transition: transform 420ms var(--e-settle); }
+@media (prefers-reduced-motion: no-preference) {
+  /* прорисовка линией при появлении сетки, шаг 35 мс по плиткам */
+  .cat-grid[data-draw='wait'] .cat-icon [pathLength] { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .cat-grid[data-draw='go'] .cat-icon [pathLength] { stroke-dasharray: 1; animation: ciDraw 900ms var(--e-settle) both; animation-delay: calc(var(--i) * 35ms + 80ms); }
+
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-flap-l { transform: rotate(26deg); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-flap-r { transform: rotate(-26deg); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-unroll { animation: ciUnroll 640ms var(--e-settle); transform-origin: 0% 50%; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-shine { animation: ciShine 700ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-bubble { animation: ciPop 460ms var(--e-settle); animation-delay: calc(var(--b) * 55ms); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-wave { animation: ciWave 820ms var(--ease-in-out); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-sheet { animation: ciSheet 560ms var(--e-settle) both; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-sheet-2 { animation-delay: 70ms; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-sheet-3 { animation-delay: 140ms; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-pull { animation: ciPull 620ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-receipt { animation: ciReceipt 700ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-load { animation: ciLoad 640ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-spin { animation: ciSpin 820ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-fruit { animation: ciHop 520ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-fruit-2 { animation-delay: 90ms; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-strap { animation: ciStrap 560ms var(--e-settle); }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-swing { animation: ciSwing 900ms var(--ease-in-out); transform-origin: 50% 0%; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-stretch { animation: ciStretch 640ms var(--e-settle); transform-origin: 50% 0%; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-wave-hand { animation: ciHand 820ms var(--ease-in-out); transform-origin: 50% 100%; }
+  .cat-grid .cat-tile:is(:hover, :focus-visible) .ci-nail { animation: ciNail 520ms var(--e-settle); }
+}
+@keyframes ciDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ciUnroll { from { transform: scaleX(0.25); } to { transform: none; } }
+@keyframes ciShine { 0% { transform: translateX(-7px); opacity: 0.2; } 60% { transform: translateX(5px); opacity: 1; } 100% { transform: none; } }
+@keyframes ciPop { 0% { transform: none; } 45% { transform: scale(1.35); } 100% { transform: none; } }
+@keyframes ciWave { 0%, 100% { transform: none; } 50% { transform: translateX(-2.5px) skewX(-6deg); } }
+@keyframes ciSheet { from { transform: translateY(-7px); opacity: 0.3; } to { transform: none; opacity: 1; } }
+@keyframes ciPull { from { transform: translateX(-6px); } to { transform: none; } }
+@keyframes ciReceipt { from { transform: translateY(-9px); } to { transform: none; } }
+@keyframes ciLoad { 0% { transform: translateY(-8px); } 60% { transform: translateY(1px); } 100% { transform: none; } }
+@keyframes ciSpin { from { transform: rotate(-90deg); } to { transform: none; } }
+@keyframes ciHop { 0%, 100% { transform: none; } 40% { transform: translateY(-6px); } }
+@keyframes ciStrap { from { transform: scaleX(1.35); opacity: 0.5; } to { transform: none; opacity: 1; } }
+@keyframes ciSwing { 0%, 100% { transform: none; } 30% { transform: rotate(7deg); } 65% { transform: rotate(-4deg); } }
+@keyframes ciStretch { 0%, 100% { transform: none; } 45% { transform: scaleY(1.1); } }
+@keyframes ciHand { 0%, 100% { transform: none; } 25% { transform: rotate(-12deg); } 60% { transform: rotate(9deg); } }
+@keyframes ciNail { 0% { transform: translateY(-8px); } 40% { transform: translateY(1px); } 60% { transform: translateY(-1px); } 100% { transform: none; } }
