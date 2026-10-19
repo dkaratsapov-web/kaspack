@@ -31,6 +31,9 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
   const pointer = useRef({ x: 0, y: 0 });
   const start = useRef<number | null>(null);
   const frame = useRef<Frame>({ target: new THREE.Vector3(0, STACK_TOP * 0.47, 0), dist: 5 });
+  // смещение кадра (setViewOffset) — к нему при прокрутке добавляется подъём груза
+  const view = useRef<{ fw: number; fh: number; x: number; y: number; w: number; h: number } | null>(null);
+  const spill = useRef(false);
   const { camera, size, gl } = useThree();
   const tmp = useMemo(() => ({ a: new THREE.Vector3(), dir: new THREE.Vector3() }), []);
 
@@ -55,8 +58,13 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
     cam.aspect = rw / rh;
     const tan = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
     frame.current.dist = Math.max((STACK_TOP * 1.12) / tan, (1.7 / cam.aspect) / tan);
-    if (inFrame) cam.setViewOffset(rw, rh, -(f!.left - c.left), -(f!.top - c.top), c.width, c.height);
-    else cam.clearViewOffset();
+    if (inFrame) {
+      view.current = { fw: rw, fh: rh, x: -(f!.left - c.left), y: -(f!.top - c.top), w: c.width, h: c.height };
+      cam.setViewOffset(rw, rh, view.current.x, view.current.y, c.width, c.height);
+    } else { view.current = null; cam.clearViewOffset(); }
+    // груз выходит за первый экран (десктоп без закреплённой сцены): при прокрутке он поднимается
+    // быстрее страницы и разворачивается, и к моменту, когда каталог занял экран, ничего не перекрывает
+    spill.current = inFrame && !document.documentElement.classList.contains('kp-pin');
     cam.updateProjectionMatrix();
   }, [camera, size, gl]);
 
@@ -82,8 +90,13 @@ function Rig({ state, reduced }: { state: React.RefObject<PalletState>; reduced:
     state.current.open = span(q, 0.09, 0.22);
 
     const k = 1 - Math.pow(0.001, dt); // демпфирование, не зависит от FPS
-    const yaw = -0.6 + 0.22 * look + (reduced ? 0 : Math.sin(t * 0.22) * 0.1 * (1 - look) + pointer.current.x * 0.22);
-    const pitch = reduced ? 0 : pointer.current.y * 0.05;
+    const sp = spill.current && !reduced ? clamp01(scrollY / innerHeight) : 0;
+    if (spill.current && view.current) {
+      const v = view.current;
+      cam.setViewOffset(v.fw, v.fh, v.x, v.y + smooth(sp) * innerHeight * 0.26, v.w, v.h);
+    }
+    const yaw = -0.6 + 0.22 * look + 0.62 * smooth(sp) + (reduced ? 0 : Math.sin(t * 0.22) * 0.1 * (1 - look) + pointer.current.x * 0.22);
+    const pitch = (reduced ? 0 : pointer.current.y * 0.05) + 0.12 * smooth(sp);
     group.current.rotation.y += (yaw - group.current.rotation.y) * k;
     group.current.rotation.x += (pitch - group.current.rotation.x) * k;
     group.current.updateMatrixWorld();
